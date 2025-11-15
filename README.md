@@ -17,6 +17,7 @@ A professional web-based tool for extracting colors from images and matching the
 - **Multiple Points**: Add multiple color points to create a complete color palette
 - **Color Filtering**: Filter by Pantone system (Graphics/FHI/Plastics) and card types
 - **Similar Colors**: Find and compare similar Pantone colors with adjustable threshold
+- **Split Color Comparison**: Color swatches in similar colors dialog are split in half - left side shows the original sampled color, right side shows the Pantone match for easy visual comparison
 - **Import/Export**: Save and load your color projects in JSON format
 - **Multilingual**: Support for English and Chinese interfaces
 - **Large Database**: Includes 20,970+ Pantone colors across all categories
@@ -93,6 +94,9 @@ Then open `http://localhost:8000/index.html` in your browser.
 
 - **Drag to reposition**: Click and drag any color swatch or sampling point to move it
 - **Find similar colors**: Click "Similar" button on any color swatch to explore alternatives
+  - Each color swatch displays a split view: original color (left) vs Pantone match (right)
+  - Easily compare the sampled color with potential Pantone alternatives
+  - Adjust the Delta E threshold to find more or fewer similar colors
 - **Color filtering**: Use the "Color Filter" panel to restrict matching to specific Pantone systems
 - **Customize appearance**: Click "Settings" button to adjust:
   - Swatch size (40-150px)

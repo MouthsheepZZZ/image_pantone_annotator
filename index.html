@@ -126,12 +126,15 @@
             max-width: 95vw;
             max-height: calc(100vh - 200px);
             overflow: auto;
+            cursor: default;
         }
 
         .canvas-wrapper {
             position: relative;
             display: inline-block;
             line-height: 0;
+            transform-origin: 0 0;
+            transition: none;
         }
 
         #imageCanvas {
@@ -353,6 +356,45 @@
             background: #f0f0f0;
             padding: 5px 10px;
             border-radius: 8px;
+        }
+
+        .config-row .value-input {
+            flex: 0 0 75px;
+            text-align: center;
+            font-weight: 700;
+            color: #667eea;
+            background: white;
+            padding: 10px 8px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .config-row .value-input:focus {
+            outline: none;
+            border-color: #764ba2;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+            color: #764ba2;
+        }
+
+        .config-row .value-input:hover {
+            border-color: #764ba2;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        /* Remove spinner arrows for Chrome, Safari, Edge */
+        .config-row .value-input::-webkit-outer-spin-button,
+        .config-row .value-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Remove spinner arrows for Firefox */
+        .config-row .value-input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
         }
 
         #colorFilterPanel {
@@ -591,11 +633,39 @@
         }
 
         .current-color-swatch {
-            width: 60px;
-            height: 60px;
+            width: 200px;
+            height: 80px;
             border-radius: 8px;
             border: 2px solid #ddd;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .current-color-swatch::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(0, 0, 0, 0.15);
+            transform: translateX(-0.5px);
+        }
+        
+        .current-color-swatch::before {
+            content: 'Original                    Pantone';
+            position: absolute;
+            bottom: 3px;
+            left: 0;
+            right: 0;
+            font-size: 8px;
+            color: rgba(0, 0, 0, 0.6);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 4px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-align: center;
+            border-radius: 0 0 6px 6px;
         }
 
         .current-color-info {
@@ -709,6 +779,34 @@
             border-radius: 6px;
             margin-bottom: 10px;
             border: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .color-card-swatch::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(0, 0, 0, 0.15);
+            transform: translateX(-0.5px);
+        }
+        
+        .color-card-swatch::before {
+            content: 'Original                    Pantone';
+            position: absolute;
+            bottom: 3px;
+            left: 0;
+            right: 0;
+            font-size: 8px;
+            color: rgba(0, 0, 0, 0.6);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 4px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-align: center;
+            border-radius: 0 0 6px 6px;
         }
 
         .color-card-code {
@@ -917,23 +1015,23 @@
         <h3 data-i18n="settings.title">⚙️ Settings</h3>
         <div class="config-row">
             <label data-i18n="settings.swatchSize">Swatch Size:</label>
-            <input type="range" id="swatchSizeSlider" min="40" max="150" value="80" step="5">
-            <span class="value-display" id="swatchSizeValue">80</span>
+            <input type="range" id="swatchSizeSlider" min="0" max="100" value="80" step="1">
+            <input type="number" class="value-input" id="swatchSizeValue" min="0" value="80" step="1">
         </div>
         <div class="config-row">
             <label data-i18n="settings.codeFontSize">Code Font Size:</label>
-            <input type="range" id="fontSizeSlider" min="10" max="24" value="14" step="1">
-            <span class="value-display" id="fontSizeValue">14</span>
+            <input type="range" id="fontSizeSlider" min="0" max="100" value="14" step="1">
+            <input type="number" class="value-input" id="fontSizeValue" min="0" value="14" step="1">
         </div>
         <div class="config-row">
             <label data-i18n="settings.nameFontSize">Name Font Size:</label>
-            <input type="range" id="nameFontSizeSlider" min="8" max="18" value="11" step="1">
-            <span class="value-display" id="nameFontSizeValue">11</span>
+            <input type="range" id="nameFontSizeSlider" min="0" max="100" value="11" step="1">
+            <input type="number" class="value-input" id="nameFontSizeValue" min="0" value="11" step="1">
         </div>
         <div class="config-row">
             <label data-i18n="settings.labelWidth">Label Width:</label>
-            <input type="range" id="labelWidthSlider" min="80" max="200" value="120" step="10">
-            <span class="value-display" id="labelWidthValue">120</span>
+            <input type="range" id="labelWidthSlider" min="0" max="100" value="100" step="1">
+            <input type="number" class="value-input" id="labelWidthValue" min="0" value="120" step="1">
         </div>
     </div>
 

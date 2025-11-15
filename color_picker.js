@@ -52,13 +52,27 @@ const CARD_TYPE_DEFINITIONS = {
 let swatchPadding = 20;
 let isExporting = false; // Flag to control delete button visibility
 
-// Drag state
+// Drag state for annotations
 let dragState = {
     isDragging: false,
     dragType: null, // 'point' or 'swatch'
     dragIndex: -1,
     offsetX: 0,
     offsetY: 0
+};
+
+// Canvas view state (zoom and pan)
+let viewState = {
+    scale: 1.0,           // Current zoom scale
+    minScale: 0.1,        // Minimum zoom (10%)
+    maxScale: 5.0,        // Maximum zoom (500%)
+    panX: 0,              // Horizontal pan offset
+    panY: 0,              // Vertical pan offset
+    isPanning: false,     // Is user currently panning
+    panStartX: 0,         // Pan start mouse X
+    panStartY: 0,         // Pan start mouse Y
+    panOriginX: 0,        // Pan origin X
+    panOriginY: 0         // Pan origin Y
 };
 
 // Initialize the application
@@ -107,6 +121,21 @@ function setupEventListeners() {
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('mouseup', handleMouseUp);
     canvas.addEventListener('mouseleave', handleMouseUp);
+    
+    // Canvas zoom (mouse wheel)
+    const canvasContainer = document.getElementById('canvasContainer');
+    canvasContainer.addEventListener('wheel', handleWheel, { passive: false });
+    
+    // Canvas pan (right click drag or middle mouse button)
+    canvasContainer.addEventListener('mousedown', handlePanStart);
+    canvasContainer.addEventListener('mousemove', handlePanMove);
+    canvasContainer.addEventListener('mouseup', handlePanEnd);
+    canvasContainer.addEventListener('mouseleave', handlePanEnd);
+    
+    // Prevent context menu on right click
+    canvasContainer.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
     
     // Clear button
     document.getElementById('clearBtn').addEventListener('click', clearAllPoints);
@@ -240,37 +269,53 @@ function resizeCanvas() {
 function displayImage() {
     if (!uploadedImage) return;
     
-    const containerWidth = window.innerWidth - 40;
-    const containerHeight = window.innerHeight - 150;
+    // Use original image dimensions (no automatic scaling)
+    const originalWidth = uploadedImage.width;
+    const originalHeight = uploadedImage.height;
     
-    let scale = Math.min(
-        containerWidth / uploadedImage.width,
-        containerHeight / uploadedImage.height,
-        1
-    );
+    // Set canvas to original image size
+    imageCanvas.width = originalWidth;
+    imageCanvas.height = originalHeight;
     
-    const scaledWidth = uploadedImage.width * scale;
-    const scaledHeight = uploadedImage.height * scale;
+    canvas.width = originalWidth;
+    canvas.height = originalHeight;
     
-    imageCanvas.width = scaledWidth;
-    imageCanvas.height = scaledHeight;
-    
-    canvas.width = scaledWidth;
-    canvas.height = scaledHeight;
-    
+    // Draw image at original size
     imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-    imageCtx.drawImage(uploadedImage, 0, 0, scaledWidth, scaledHeight);
+    imageCtx.drawImage(uploadedImage, 0, 0, originalWidth, originalHeight);
+    
+    // Apply current view transform (zoom and pan)
+    applyViewTransform();
     
     redrawAnnotations();
+}
+
+// Apply view transform to canvas container
+function applyViewTransform() {
+    const container = document.querySelector('.canvas-wrapper');
+    if (!container) return;
+    
+    const transform = `translate(${viewState.panX}px, ${viewState.panY}px) scale(${viewState.scale})`;
+    container.style.transform = transform;
+    container.style.transformOrigin = '0 0';
 }
 
 // Handle mouse down - check for drag or add new point
 function handleMouseDown(e) {
     if (!uploadedImage) return;
     
+    // Only handle left mouse button (button 0) for annotations
+    // Right button (2) and middle button (1) are handled by pan functions
+    if (e.button !== 0) return;
+    
+    // Transform mouse coordinates to canvas space
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Convert to canvas coordinates (accounting for zoom and pan)
+    const x = mouseX / viewState.scale;
+    const y = mouseY / viewState.scale;
     
     // Check if clicking on existing point or swatch
     const clickedElement = findClickedElement(x, y);
@@ -319,21 +364,17 @@ function handleMouseDown(e) {
             b: pixelData[2]
         };
         
-        console.log('RGB color:', rgb);
-        
         // Find closest Pantone color using filtered data
         const pantone = findClosestPantone(rgb, filteredPantoneData.length > 0 ? filteredPantoneData : pantoneData);
         
-        console.log('Matched Pantone:', pantone);
-        
         if (pantone) {
-            // Calculate initial swatch position
+            // Calculate initial swatch position (fixed pixel distance from sample point)
             const angle = (colorPoints.length * (360 / Math.max(colorPoints.length + 1, 8))) * Math.PI / 180;
-            const radius = 150;
+            const radius = 150; // Fixed pixel radius relative to original image
             let swatchX = x + Math.cos(angle) * radius;
             let swatchY = y + Math.sin(angle) * radius;
             
-            // Ensure swatch stays within canvas
+            // Ensure swatch stays within canvas bounds
             swatchX = Math.max(window.SWATCH_CONFIG.labelWidth, Math.min(swatchX, canvas.width - window.SWATCH_CONFIG.swatchSize - 10));
             swatchY = Math.max(window.SWATCH_CONFIG.swatchSize + 40, Math.min(swatchY, canvas.height - 10));
             
@@ -358,9 +399,14 @@ function handleMouseDown(e) {
 function handleMouseMove(e) {
     if (!uploadedImage) return;
     
+    // Transform mouse coordinates to canvas space
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Convert to canvas coordinates (accounting for zoom and pan)
+    const x = mouseX / viewState.scale;
+    const y = mouseY / viewState.scale;
     
     if (dragState.isDragging) {
         // Update position while dragging
@@ -415,6 +461,73 @@ function handleMouseUp(e) {
         dragState.dragType = null;
         dragState.dragIndex = -1;
         canvas.style.cursor = 'crosshair';
+    }
+}
+
+// Handle mouse wheel for zooming
+function handleWheel(e) {
+    if (!uploadedImage) return;
+    
+    e.preventDefault();
+    
+    // Get mouse position relative to canvas container
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Calculate zoom delta
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const newScale = Math.max(viewState.minScale, Math.min(viewState.maxScale, viewState.scale * delta));
+    
+    // Calculate new pan to zoom towards mouse position
+    const scaleChange = newScale / viewState.scale;
+    viewState.panX = mouseX - (mouseX - viewState.panX) * scaleChange;
+    viewState.panY = mouseY - (mouseY - viewState.panY) * scaleChange;
+    viewState.scale = newScale;
+    
+    applyViewTransform();
+}
+
+// Handle pan start (right mouse button or middle button)
+function handlePanStart(e) {
+    if (!uploadedImage) return;
+    
+    // Right mouse button (2) or middle button (1)
+    if (e.button === 2 || e.button === 1) {
+        e.preventDefault();
+        viewState.isPanning = true;
+        viewState.panStartX = e.clientX;
+        viewState.panStartY = e.clientY;
+        viewState.panOriginX = viewState.panX;
+        viewState.panOriginY = viewState.panY;
+        
+        const container = document.getElementById('canvasContainer');
+        container.style.cursor = 'grabbing';
+    }
+}
+
+// Handle pan move
+function handlePanMove(e) {
+    if (!viewState.isPanning) return;
+    
+    e.preventDefault();
+    
+    const dx = e.clientX - viewState.panStartX;
+    const dy = e.clientY - viewState.panStartY;
+    
+    viewState.panX = viewState.panOriginX + dx;
+    viewState.panY = viewState.panOriginY + dy;
+    
+    applyViewTransform();
+}
+
+// Handle pan end
+function handlePanEnd(e) {
+    if (viewState.isPanning) {
+        viewState.isPanning = false;
+        
+        const container = document.getElementById('canvasContainer');
+        container.style.cursor = 'default';
     }
 }
 
@@ -478,7 +591,7 @@ function drawAnnotation(point, index, hideDeleteButton = false) {
     const { x, y, swatchX, swatchY, pantone } = point;
     const config = window.SWATCH_CONFIG;
     
-    // Draw point on image
+    // Draw point on image (fixed size relative to original image pixels)
     ctx.fillStyle = '#5D4037';
     ctx.beginPath();
     ctx.arc(x, y, 8, 0, 2 * Math.PI);
@@ -496,7 +609,7 @@ function drawAnnotation(point, index, hideDeleteButton = false) {
     ctx.lineTo(swatchX + config.swatchSize / 2, swatchY);
     ctx.stroke();
     
-    // Draw color swatch
+    // Draw color swatch (fixed size relative to original image pixels)
     ctx.fillStyle = pantone.hex;
     ctx.fillRect(swatchX, swatchY, config.swatchSize, config.swatchSize);
     
@@ -505,7 +618,7 @@ function drawAnnotation(point, index, hideDeleteButton = false) {
     ctx.lineWidth = 2;
     ctx.strokeRect(swatchX, swatchY, config.swatchSize, config.swatchSize);
     
-    // Draw label background
+    // Draw label background (fixed size relative to original image pixels)
     ctx.fillStyle = '#FFFFFF';
     const labelX = swatchX + config.swatchSize + 10;
     const labelY = swatchY;
@@ -517,7 +630,7 @@ function drawAnnotation(point, index, hideDeleteButton = false) {
     ctx.lineWidth = 1;
     ctx.strokeRect(labelX, labelY, labelWidth, labelHeight);
     
-    // Draw text
+    // Draw text (fixed size relative to original image pixels)
     ctx.fillStyle = '#000000';
     ctx.font = `bold ${config.fontSize}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
     ctx.textAlign = 'left';
@@ -833,14 +946,70 @@ function setupConfigSliders() {
     ];
     
     sliders.forEach(slider => {
-        const element = document.getElementById(slider.id + 'Slider');
-        const display = document.getElementById(slider.displayId);
+        const sliderElement = document.getElementById(slider.id + 'Slider');
+        const inputElement = document.getElementById(slider.displayId);
         
-        if (element && display) {
-            element.addEventListener('input', (e) => {
+        if (sliderElement && inputElement) {
+            // Slider changes input
+            sliderElement.addEventListener('input', (e) => {
                 const value = parseInt(e.target.value);
                 window.SWATCH_CONFIG[slider.prop] = value;
-                display.textContent = value;
+                inputElement.value = value;
+                redrawAnnotations();
+            });
+            
+            // Input changes slider
+            inputElement.addEventListener('input', (e) => {
+                let value = parseInt(e.target.value);
+                
+                // Validate input - only check minimum
+                const min = parseInt(inputElement.min);
+                const sliderMax = parseInt(sliderElement.max);
+                
+                if (isNaN(value)) {
+                    return;
+                }
+                
+                // Only enforce minimum, no maximum for input
+                value = Math.max(min, value);
+                
+                window.SWATCH_CONFIG[slider.prop] = value;
+                
+                // Update slider only if value is within slider range
+                if (value <= sliderMax) {
+                    sliderElement.value = value;
+                } else {
+                    sliderElement.value = sliderMax;
+                }
+                
+                inputElement.value = value;
+                redrawAnnotations();
+            });
+            
+            // Handle blur to ensure valid value
+            inputElement.addEventListener('blur', (e) => {
+                let value = parseInt(e.target.value);
+                const min = parseInt(inputElement.min);
+                const sliderMax = parseInt(sliderElement.max);
+                
+                if (isNaN(value) || value < min) {
+                    // If invalid, revert to current config value
+                    value = window.SWATCH_CONFIG[slider.prop];
+                } else {
+                    // Only enforce minimum
+                    value = Math.max(min, value);
+                }
+                
+                inputElement.value = value;
+                
+                // Update slider only if value is within slider range
+                if (value <= sliderMax) {
+                    sliderElement.value = value;
+                } else {
+                    sliderElement.value = sliderMax;
+                }
+                
+                window.SWATCH_CONFIG[slider.prop] = value;
                 redrawAnnotations();
             });
         }
@@ -1137,8 +1306,11 @@ function showSimilarColorsModal(pointIndex) {
     const point = colorPoints[pointIndex];
     const currentPantone = point.pantone;
     
-    // Update modal header with current color
-    document.getElementById('modalCurrentSwatch').style.backgroundColor = currentPantone.hex;
+    // Update modal header with current color - split display
+    const originalColorHex = rgbToHex(point.rgb.r, point.rgb.g, point.rgb.b);
+    const modalSwatch = document.getElementById('modalCurrentSwatch');
+    const gradientStyle = `linear-gradient(90deg, ${originalColorHex} 0%, ${originalColorHex} 50%, ${currentPantone.hex} 50%, ${currentPantone.hex} 100%)`;
+    modalSwatch.style.background = gradientStyle;
     document.getElementById('modalCurrentCode').textContent = currentPantone.code;
     document.getElementById('modalCurrentName').textContent = currentPantone.name;
     
@@ -1256,6 +1428,10 @@ function renderSimilarColors(similarColors, currentPantone) {
     
     grid.innerHTML = '';
     
+    // Get original color from current point
+    const point = colorPoints[currentEditingPointIndex];
+    const originalColorHex = rgbToHex(point.rgb.r, point.rgb.g, point.rgb.b);
+    
     similarColors.forEach(pantone => {
         const card = document.createElement('div');
         card.className = 'color-card';
@@ -1270,8 +1446,9 @@ function renderSimilarColors(similarColors, currentPantone) {
             window.i18n.t('similarColors.selectButton') : 
             'Select';
         
+        // Create split color swatch: left half original, right half pantone
         card.innerHTML = `
-            <div class="color-card-swatch" style="background-color: ${pantone.hex};"></div>
+            <div class="color-card-swatch" style="background: linear-gradient(90deg, ${originalColorHex} 0%, ${originalColorHex} 50%, ${pantone.hex} 50%, ${pantone.hex} 100%);"></div>
             <div class="color-card-code">${displayCode}</div>
             <div class="color-card-name">${pantone.name}</div>
             <div class="color-card-delta">${deltaText}</div>
@@ -1545,7 +1722,7 @@ function applyImportedSettings(settings) {
     // Update global config, merging with existing to preserve defaults
     window.SWATCH_CONFIG = { ...window.SWATCH_CONFIG, ...settings };
 
-    // Update UI sliders and displays
+    // Update UI sliders and input fields
     const sliders = [
         { id: 'swatchSize', prop: 'swatchSize', displayId: 'swatchSizeValue' },
         { id: 'fontSize', prop: 'fontSize', displayId: 'fontSizeValue' },
@@ -1556,10 +1733,10 @@ function applyImportedSettings(settings) {
     sliders.forEach(slider => {
         const value = window.SWATCH_CONFIG[slider.prop];
         if (value !== undefined) {
-            const element = document.getElementById(slider.id + 'Slider');
-            const display = document.getElementById(slider.displayId);
-            if (element) element.value = value;
-            if (display) display.textContent = value;
+            const sliderElement = document.getElementById(slider.id + 'Slider');
+            const inputElement = document.getElementById(slider.displayId);
+            if (sliderElement) sliderElement.value = value;
+            if (inputElement) inputElement.value = value;
         }
     });
 
