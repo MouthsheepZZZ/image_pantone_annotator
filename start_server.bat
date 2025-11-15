@@ -1,0 +1,6 @@
+@echo off
+echo Starting local server on port 8000...
+start "Local Server" python -m http.server 8000
+timeout /t 2 /nobreak > nul
+echo Opening color_picker.html in your browser...
+start http://localhost:8000/color_picker.html

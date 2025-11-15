@@ -1,0 +1,160 @@
+{
+  "header": {
+    "title": "Pantone 色彩选择器",
+    "subtitle": "从图片中提取颜色并匹配到 Pantone 色卡"
+  },
+  "dropZone": {
+    "text": "点击上传或拖拽图片",
+    "hint": "支持 JPG、PNG、GIF、WebP",
+    "pasteHint": "或按 Ctrl+V 从剪贴板粘贴"
+  },
+  "buttons": {
+    "newImage": "新图片",
+    "importJson": "导入 JSON",
+    "exportJson": "导出 JSON",
+    "exportImage": "导出图片",
+    "colorFilter": "颜色筛选",
+    "settings": "设置",
+    "undo": "撤销",
+    "clearAll": "清除全部"
+  },
+  "settings": {
+    "title": "设置",
+    "swatchSize": "色块大小：",
+    "codeFontSize": "代码字体大小：",
+    "nameFontSize": "名称字体大小：",
+    "labelWidth": "标签宽度："
+  },
+  "colorFilter": {
+    "title": "颜色筛选",
+    "systemTitle": "Pantone 系统（单选）",
+    "allSystems": "所有系统",
+    "graphics": "图形设计 (PMS)",
+    "fhi": "时尚、家居 + 室内 (FHI)",
+    "plastics": "塑料",
+    "cardTypeTitle": "色卡类型（多选）",
+    "cardTypeHint": "选择特定系统以按色卡类型筛选",
+    "mainTypes": "主类型",
+    "suffixFilters": "后缀筛选（取交集）",
+    "statsLoading": "正在加载色彩数据库...",
+    "statsShowing": "显示 {filtered} / {total} 种颜色",
+    "statsAllSystems": "（所有系统）",
+    "statsSystem": "（{system}）",
+    "statsTypes": "，{count} 种类型已选",
+    "statsType": "，{count} 种类型已选"
+  },
+  "instructions": {
+    "title": "使用说明",
+    "step1": "<strong>上传图片：</strong>点击上传区域或拖放图片文件",
+    "step2": "<strong>点击提取颜色：</strong>点击图片上的任意位置提取该点的颜色",
+    "step3": "<strong>查看 Pantone 匹配：</strong>最接近的 Pantone 颜色将显示色块和代码",
+    "step4": "<strong>拖动重新定位：</strong>点击并拖动任何色块或采样点以自由移动",
+    "step5": "<strong>筛选颜色：</strong>点击「颜色筛选」以选择特定的 Pantone 系统和色卡类型进行匹配",
+    "step6": "<strong>自定义显示：</strong>点击「设置」以调整色块大小和字体大小",
+    "step7": "<strong>添加多个点：</strong>点击多个位置以从图片创建调色板",
+    "step8": "<strong>导出图片：</strong>点击「导出图片」以下载带有所有颜色标签的注释图片",
+    "step9": "<strong>导出 JSON：</strong>点击「导出 JSON」以保存颜色点数据和坐标供以后使用",
+    "step10": "<strong>导入 JSON：</strong>点击「导入 JSON」以恢复之前保存的颜色点及其位置"
+  },
+  "features": {
+    "accurateMatching": {
+      "title": "精确匹配",
+      "desc": "使用 Delta E 算法精确匹配 Pantone 数据库"
+    },
+    "visualAnnotations": {
+      "title": "可视化标注",
+      "desc": "带连接线和标签的美观色块"
+    },
+    "draggableElements": {
+      "title": "可拖动元素",
+      "desc": "使用鼠标自由移动色块和采样点"
+    },
+    "colorFiltering": {
+      "title": "颜色筛选",
+      "desc": "按 Pantone 系统（图形/FHI/塑料）和色卡类型筛选"
+    },
+    "customizable": {
+      "title": "可自定义",
+      "desc": "根据偏好调整色块大小和字体大小"
+    },
+    "easyExport": {
+      "title": "轻松导出",
+      "desc": "一键下载注释图片"
+    },
+    "saveLoad": {
+      "title": "保存和加载",
+      "desc": "将颜色点导出/导入为 JSON 以重复使用"
+    },
+    "fastResponsive": {
+      "title": "快速响应",
+      "desc": "即时颜色提取和匹配"
+    }
+  },
+  "similarColors": {
+    "title": "查找相似颜色",
+    "subtitle": "发现接近您选择的替代 Pantone 颜色",
+    "currentSelection": "当前选择",
+    "threshold": "阈值：",
+    "selectButton": "选择",
+    "cancel": "取消",
+    "noResults": "未找到相似颜色",
+    "noResultsHint": "尝试增加阈值以查看更多颜色",
+    "deltaE": "ΔE: {value}"
+  },
+  "alerts": {
+    "selectImageFile": "请选择图片文件",
+    "pantoneLoading": "Pantone 色彩数据库仍在加载中。请稍候再试。",
+    "clearConfirm": "清除所有颜色点？",
+    "pantoneLoadError": "无法加载 Pantone 色彩数据库。请确保 pantone_data.json 可访问且服务器正在运行。",
+    "selectExportOption": "请至少选择一个导出选项",
+    "copiedToClipboard": "图片已复制到剪贴板！",
+    "clipboardError": "复制到剪贴板失败。您的浏览器可能不支持此功能。",
+    "exportError": "导出图片失败",
+    "uploadImageFirst": "请先上传图片。",
+    "enterFilename": "请输入文件名",
+    "fileSaved": "文件保存成功！",
+    "imageFromClipboard": "已从剪贴板加载图片",
+    "dimensionMismatch": "警告：图像尺寸不匹配。\nJSON: {jsonWidth}x{jsonHeight}\n当前: {canvasWidth}x{canvasHeight}\n\n颜色点可能无法正确对齐。是否继续？",
+    "replacePointsConfirm": "在 JSON 中找到 {importedCount} 个颜色点。\n您当前有 {currentCount} 个颜色点。\n\n点击“确定”以替换现有颜色点\n点击“取消”以附加到现有颜色点"
+  },
+  "cardTypes": {
+    "graphics": {
+      "solid": "实色 (C/U)",
+      "colorbridge": "色彩桥梁 (CP/UP)",
+      "cmykguide": "CMYK 指南 (P)",
+      "pastelsneons": "粉彩 & 荧光色",
+      "metallics": "金属色",
+      "extendedgamut": "扩展色域 (XGC)",
+      "suffixc": "涂布纸 (C)",
+      "suffixu": "非涂布纸 (U)"
+    },
+    "fhi": {
+      "cottonTcx": "棉布 (TCX)",
+      "paperTpg": "纸张 (TPG)",
+      "paperTpx": "纸张 (TPX)",
+      "polyesterTsx": "聚酯 (TSX)",
+      "nylonTn": "尼龙 (TN)"
+    },
+    "plastics": {
+      "plasticChips": "塑料芯片 (PQ/Q)"
+    }
+  },
+  "exportImage": {
+    "title": "导出图片选项",
+    "imageType": "图片类型：",
+    "fullImage": "完整图片",
+    "swatchesOnly": "仅色卡标识（透明背景）",
+    "saveOptions": "保存选项：",
+    "downloadFile": "下载文件",
+    "copyToClipboard": "复制到剪贴板",
+    "cancel": "取消",
+    "export": "导出"
+  },
+  "exportJson": {
+    "title": "导出 JSON 选项",
+    "filename": "文件名：",
+    "saveLocationNote": "您可以选择保存位置",
+    "cancel": "取消",
+    "export": "导出"
+  }
+}

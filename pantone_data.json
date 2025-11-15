@@ -1,4 +1,4 @@
-const PANTONE_DATA = {
+{
     "set1": [
         {
             "code": "19-3909 TCX",
@@ -146791,4 +146791,5 @@ const PANTONE_DATA = {
             "category": "Graphic Designers"
         }
     ]
-};
+
+}

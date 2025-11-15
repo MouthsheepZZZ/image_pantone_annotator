@@ -400,6 +400,19 @@
             transform: translateY(-1px);
         }
 
+        .filter-type-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-section-subtitle {
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #4a5568;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
         .filter-checkbox-group {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -760,12 +773,97 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
+
+        /* Language Switcher */
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #667eea;
+            font-size: 0.9em;
+        }
+
+        .lang-btn:hover {
+            background: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Export Options Styles */
+        .export-option-section {
+            margin-bottom: 15px;
+        }
+
+        .export-section-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+
+        .export-checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .json-filename-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .json-filename-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .export-info-text {
+            color: #666;
+            font-size: 0.85em;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
     </style>
 </head>
 <body>
+    <!-- Language Switcher -->
+    <div class="lang-switcher">
+        <button class="lang-btn" data-lang="en" onclick="window.i18n.setLanguage('en')">English</button>
+        <button class="lang-btn" data-lang="zh" onclick="window.i18n.setLanguage('zh')">中文</button>
+    </div>
+
     <div class="header">
-        <h1>🎨 Pantone Color Picker</h1>
-        <p>Extract colors from images and match them to Pantone color cards</p>
+        <h1 data-i18n="header.title">🎨 Pantone Color Picker</h1>
+        <p data-i18n="header.subtitle">Extract colors from images and match them to Pantone color cards</p>
     </div>
 
     <div id="dropZone" onclick="document.getElementById('fileInput').click()">
@@ -774,8 +872,9 @@
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
         </svg>
-        <p>Click to upload or drag & drop an image</p>
-        <small>Supports JPG, PNG, GIF, WebP</small>
+        <p data-i18n="dropZone.text">Click to upload or drag & drop an image</p>
+        <small data-i18n="dropZone.hint">Supports JPG, PNG, GIF, WebP</small>
+        <small data-i18n="dropZone.pasteHint" style="display: block; margin-top: 8px; opacity: 0.8;">Or press Ctrl+V to paste from clipboard</small>
     </div>
 
     <input type="file" id="fileInput" accept="image/*">
@@ -789,56 +888,56 @@
     </div>
 
     <div id="configPanel">
-        <h3>⚙️ Settings</h3>
+        <h3 data-i18n="settings.title">⚙️ Settings</h3>
         <div class="config-row">
-            <label>Swatch Size:</label>
+            <label data-i18n="settings.swatchSize">Swatch Size:</label>
             <input type="range" id="swatchSizeSlider" min="40" max="150" value="80" step="5">
             <span class="value-display" id="swatchSizeValue">80</span>
         </div>
         <div class="config-row">
-            <label>Code Font Size:</label>
+            <label data-i18n="settings.codeFontSize">Code Font Size:</label>
             <input type="range" id="fontSizeSlider" min="10" max="24" value="14" step="1">
             <span class="value-display" id="fontSizeValue">14</span>
         </div>
         <div class="config-row">
-            <label>Name Font Size:</label>
+            <label data-i18n="settings.nameFontSize">Name Font Size:</label>
             <input type="range" id="nameFontSizeSlider" min="8" max="18" value="11" step="1">
             <span class="value-display" id="nameFontSizeValue">11</span>
         </div>
         <div class="config-row">
-            <label>Label Width:</label>
+            <label data-i18n="settings.labelWidth">Label Width:</label>
             <input type="range" id="labelWidthSlider" min="80" max="200" value="120" step="10">
             <span class="value-display" id="labelWidthValue">120</span>
         </div>
     </div>
 
     <div id="colorFilterPanel">
-        <h3>🎨 Color Filter</h3>
+        <h3 data-i18n="colorFilter.title">🎨 Color Filter</h3>
         
         <div class="filter-section">
-            <div class="filter-section-title">Pantone System (Single Selection)</div>
+            <div class="filter-section-title" data-i18n="colorFilter.systemTitle">Pantone System (Single Selection)</div>
             <div class="filter-radio-group" id="systemFilterGroup">
                 <div class="filter-radio-option">
                     <input type="radio" id="system-all" name="pantone-system" value="all" checked>
-                    <label class="filter-radio-label" for="system-all">All Systems</label>
+                    <label class="filter-radio-label" for="system-all" data-i18n="colorFilter.allSystems">All Systems</label>
                 </div>
                 <div class="filter-radio-option">
                     <input type="radio" id="system-graphics" name="pantone-system" value="graphics">
-                    <label class="filter-radio-label" for="system-graphics">Graphics (PMS)</label>
+                    <label class="filter-radio-label" for="system-graphics" data-i18n="colorFilter.graphics">Graphics (PMS)</label>
                 </div>
                 <div class="filter-radio-option">
                     <input type="radio" id="system-fhi" name="pantone-system" value="fhi">
-                    <label class="filter-radio-label" for="system-fhi">Fashion, Home + Interiors (FHI)</label>
+                    <label class="filter-radio-label" for="system-fhi" data-i18n="colorFilter.fhi">Fashion, Home + Interiors (FHI)</label>
                 </div>
                 <div class="filter-radio-option">
                     <input type="radio" id="system-plastics" name="pantone-system" value="plastics">
-                    <label class="filter-radio-label" for="system-plastics">Plastics</label>
+                    <label class="filter-radio-label" for="system-plastics" data-i18n="colorFilter.plastics">Plastics</label>
                 </div>
             </div>
         </div>
 
         <div class="filter-section">
-            <div class="filter-section-title">Card Type (Multiple Selection)</div>
+            <div class="filter-section-title" data-i18n="colorFilter.cardTypeTitle">Card Type (Multiple Selection)</div>
             <div class="filter-checkbox-group" id="cardTypeFilterGroup">
                 <!-- Dynamic content will be loaded here based on system selection -->
             </div>
@@ -857,7 +956,7 @@
                     <polyline points="1 20 1 14 7 14"></polyline>
                     <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
                 </svg>
-                New Image
+                <span data-i18n="buttons.newImage">New Image</span>
             </button>
         </div>
         <div class="control-group">
@@ -867,7 +966,7 @@
                     <polyline points="17 8 12 3 7 8"></polyline>
                     <line x1="12" y1="3" x2="12" y2="15"></line>
                 </svg>
-                Import JSON
+                <span data-i18n="buttons.importJson">Import JSON</span>
             </button>
             <button class="btn btn-primary" id="exportJsonBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -877,7 +976,7 @@
                     <line x1="16" y1="17" x2="8" y2="17"></line>
                     <line x1="10" y1="9" x2="8" y2="9"></line>
                 </svg>
-                Export JSON
+                <span data-i18n="buttons.exportJson">Export JSON</span>
             </button>
             <button class="btn btn-primary" id="exportBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -885,7 +984,7 @@
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
-                Export Image
+                <span data-i18n="buttons.exportImage">Export Image</span>
             </button>
         </div>
         <div class="control-group">
@@ -893,79 +992,79 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path>
                 </svg>
-                Color Filter
+                <span data-i18n="buttons.colorFilter">Color Filter</span>
             </button>
             <button class="btn btn-secondary" id="configBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M12 1v6m0 6v6m0-18a2 2 0 0 1 2 2v.4a2 2 0 0 0 1 1.7l2 1.2a2 2 0 0 1 1 1.7V8a2 2 0 0 1-2 2h-.4a2 2 0 0 0-1.7 1l-1.2 2a2 2 0 0 1-1.7 1H8a2 2 0 0 1-2-2v-.4a2 2 0 0 0-1-1.7l-2-1.2a2 2 0 0 1-1-1.7V8a2 2 0 0 1 2-2h.4a2 2 0 0 0 1.7-1l1.2-2a2 2 0 0 1 1.7-1z"></path>
                 </svg>
-                Settings
+                <span data-i18n="buttons.settings">Settings</span>
             </button>
             <button class="btn btn-secondary" id="undoBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="1 4 1 10 7 10"></polyline>
                     <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
                 </svg>
-                Undo
+                <span data-i18n="buttons.undo">Undo</span>
             </button>
             <button class="btn btn-danger" id="clearBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                 </svg>
-                Clear All
+                <span data-i18n="buttons.clearAll">Clear All</span>
             </button>
         </div>
     </div>
 
     <div class="instructions">
-        <h3>📖 How to Use</h3>
+        <h3 data-i18n="instructions.title">📖 How to Use</h3>
         <ol>
-            <li><strong>Upload an Image:</strong> Click the upload area or drag and drop your image file</li>
-            <li><strong>Click to Extract Colors:</strong> Click anywhere on the image to extract the color at that point</li>
-            <li><strong>View Pantone Match:</strong> The closest matching Pantone color will be displayed with a color swatch and code</li>
-            <li><strong>Drag to Reposition:</strong> Click and drag any color swatch or sampling point to move it freely</li>
-            <li><strong>Filter Colors:</strong> Click "Color Filter" to select specific Pantone systems and card types for matching</li>
-            <li><strong>Customize Display:</strong> Click "Settings" to adjust swatch size and font sizes to your preference</li>
-            <li><strong>Add Multiple Points:</strong> Click multiple locations to create a color palette from your image</li>
-            <li><strong>Export Image:</strong> Click "Export Image" to download the annotated image with all color labels</li>
-            <li><strong>Export JSON:</strong> Click "Export JSON" to save color point data with coordinates for later use</li>
-            <li><strong>Import JSON:</strong> Click "Import JSON" to restore previously saved color points and their positions</li>
+            <li data-i18n-html="instructions.step1"><strong>Upload an Image:</strong> Click the upload area or drag and drop your image file</li>
+            <li data-i18n-html="instructions.step2"><strong>Click to Extract Colors:</strong> Click anywhere on the image to extract the color at that point</li>
+            <li data-i18n-html="instructions.step3"><strong>View Pantone Match:</strong> The closest matching Pantone color will be displayed with a color swatch and code</li>
+            <li data-i18n-html="instructions.step4"><strong>Drag to Reposition:</strong> Click and drag any color swatch or sampling point to move it freely</li>
+            <li data-i18n-html="instructions.step5"><strong>Filter Colors:</strong> Click "Color Filter" to select specific Pantone systems and card types for matching</li>
+            <li data-i18n-html="instructions.step6"><strong>Customize Display:</strong> Click "Settings" to adjust swatch size and font sizes to your preference</li>
+            <li data-i18n-html="instructions.step7"><strong>Add Multiple Points:</strong> Click multiple locations to create a color palette from your image</li>
+            <li data-i18n-html="instructions.step8"><strong>Export Image:</strong> Click "Export Image" to download the annotated image with all color labels</li>
+            <li data-i18n-html="instructions.step9"><strong>Export JSON:</strong> Click "Export JSON" to save color point data with coordinates for later use</li>
+            <li data-i18n-html="instructions.step10"><strong>Import JSON:</strong> Click "Import JSON" to restore previously saved color points and their positions</li>
         </ol>
 
         <div class="feature-list">
             <div class="feature">
-                <strong>🎯 Accurate Matching</strong>
-                Uses Delta E algorithm for precise color matching to Pantone database
+                <strong data-i18n="features.accurateMatching.title">🎯 Accurate Matching</strong>
+                <span data-i18n="features.accurateMatching.desc">Uses Delta E algorithm for precise color matching to Pantone database</span>
             </div>
             <div class="feature">
-                <strong>🎨 Visual Annotations</strong>
-                Beautiful color swatches with connecting lines and labels
+                <strong data-i18n="features.visualAnnotations.title">🎨 Visual Annotations</strong>
+                <span data-i18n="features.visualAnnotations.desc">Beautiful color swatches with connecting lines and labels</span>
             </div>
             <div class="feature">
-                <strong>🖱️ Draggable Elements</strong>
-                Move swatches and sampling points freely with mouse
+                <strong data-i18n="features.draggableElements.title">🖱️ Draggable Elements</strong>
+                <span data-i18n="features.draggableElements.desc">Move swatches and sampling points freely with mouse</span>
             </div>
             <div class="feature">
-                <strong>🎨 Color Filtering</strong>
-                Filter by Pantone system (Graphics/FHI/Plastics) and card types
+                <strong data-i18n="features.colorFiltering.title">🎨 Color Filtering</strong>
+                <span data-i18n="features.colorFiltering.desc">Filter by Pantone system (Graphics/FHI/Plastics) and card types</span>
             </div>
             <div class="feature">
-                <strong>⚙️ Customizable</strong>
-                Adjust swatch size and font sizes to your preference
+                <strong data-i18n="features.customizable.title">⚙️ Customizable</strong>
+                <span data-i18n="features.customizable.desc">Adjust swatch size and font sizes to your preference</span>
             </div>
             <div class="feature">
-                <strong>📤 Easy Export</strong>
-                Download your annotated image with one click
+                <strong data-i18n="features.easyExport.title">📤 Easy Export</strong>
+                <span data-i18n="features.easyExport.desc">Download your annotated image with one click</span>
             </div>
             <div class="feature">
-                <strong>💾 Save & Load</strong>
-                Export/import color points as JSON for reuse
+                <strong data-i18n="features.saveLoad.title">💾 Save & Load</strong>
+                <span data-i18n="features.saveLoad.desc">Export/import color points as JSON for reuse</span>
             </div>
             <div class="feature">
-                <strong>⚡ Fast & Responsive</strong>
-                Instant color extraction and matching
+                <strong data-i18n="features.fastResponsive.title">⚡ Fast & Responsive</strong>
+                <span data-i18n="features.fastResponsive.desc">Instant color extraction and matching</span>
             </div>
         </div>
     </div>
@@ -976,21 +1075,21 @@
             <div class="modal-header">
                 <div class="modal-title">
                     <span>🔍</span>
-                    <span>Find Similar Colors</span>
+                    <span data-i18n="similarColors.title">Find Similar Colors</span>
                 </div>
-                <div class="modal-subtitle">Discover alternative Pantone colors close to your selection</div>
+                <div class="modal-subtitle" data-i18n="similarColors.subtitle">Discover alternative Pantone colors close to your selection</div>
                 
                 <div class="current-color-display">
                     <div class="current-color-swatch" id="modalCurrentSwatch"></div>
                     <div class="current-color-info">
                         <div class="current-color-code" id="modalCurrentCode"></div>
                         <div class="current-color-name" id="modalCurrentName"></div>
-                        <div class="current-color-delta">Current Selection</div>
+                        <div class="current-color-delta" data-i18n="similarColors.currentSelection">Current Selection</div>
                     </div>
                 </div>
 
                 <div class="threshold-control">
-                    <label>Threshold:</label>
+                    <label data-i18n="similarColors.threshold">Threshold:</label>
                     <input type="range" id="thresholdSlider" min="1" max="20" value="8" step="0.5">
                     <span class="threshold-value" id="thresholdValue">8.0</span>
                 </div>
@@ -1003,13 +1102,95 @@
             </div>
 
             <div class="modal-footer">
-                <button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button>
+                <button class="modal-btn modal-btn-cancel" id="modalCancelBtn" data-i18n="similarColors.cancel">Cancel</button>
             </div>
         </div>
     </div>
 
-    <script src="pantone_data.js"></script>
+    <!-- Export Image Options Modal -->
+    <div class="modal-overlay" id="exportImageModal">
+        <div class="similar-colors-modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>📤</span>
+                    <span data-i18n="exportImage.title">Export Image Options</span>
+                </div>
+            </div>
+
+            <div class="modal-body" style="padding: 30px;">
+                <div class="export-option-section">
+                    <div class="export-section-title" data-i18n="exportImage.imageType">Image Type:</div>
+                    <div class="filter-radio-group">
+                        <div class="filter-radio-option">
+                            <input type="radio" id="export-full-image" name="export-type" value="full" checked>
+                            <label class="filter-radio-label" for="export-full-image" data-i18n="exportImage.fullImage">Full Image</label>
+                        </div>
+                        <div class="filter-radio-option">
+                            <input type="radio" id="export-swatches-only" name="export-type" value="swatches">
+                            <label class="filter-radio-label" for="export-swatches-only" data-i18n="exportImage.swatchesOnly">Swatches Only (Transparent)</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="export-option-section" style="margin-top: 25px;">
+                    <div class="export-section-title" data-i18n="exportImage.saveOptions">Save Options:</div>
+                    <div class="export-checkbox-group">
+                        <div class="filter-checkbox-option">
+                            <input type="checkbox" id="export-download" checked>
+                            <label class="filter-checkbox-label" for="export-download" data-i18n="exportImage.downloadFile">Download File</label>
+                        </div>
+                        <div class="filter-checkbox-option">
+                            <input type="checkbox" id="export-clipboard">
+                            <label class="filter-checkbox-label" for="export-clipboard" data-i18n="exportImage.copyToClipboard">Copy to Clipboard</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" id="exportImageCancelBtn" data-i18n="exportImage.cancel">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="exportImageConfirmBtn" data-i18n="exportImage.export">Export</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export JSON Options Modal -->
+    <div class="modal-overlay" id="exportJsonModal">
+        <div class="similar-colors-modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>💾</span>
+                    <span data-i18n="exportJson.title">Export JSON Options</span>
+                </div>
+            </div>
+
+            <div class="modal-body" style="padding: 30px;">
+                <div class="export-option-section">
+                    <label class="export-section-title" for="json-filename" data-i18n="exportJson.filename">File Name:</label>
+                    <input type="text" id="json-filename" class="json-filename-input" value="pantone_project">
+                </div>
+                
+                <div class="export-option-section" style="margin-top: 20px;">
+                    <div class="export-info-text" data-i18n="exportJson.saveLocationNote">File will be saved to your default downloads folder</div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" id="exportJsonCancelBtn" data-i18n="exportJson.cancel">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="exportJsonConfirmBtn" data-i18n="exportJson.export">Export</button>
+            </div>
+        </div>
+    </div>
+
     <script src="color_utils.js"></script>
+    <script src="i18n.js"></script>
     <script src="color_picker.js"></script>
+    <script>
+        // Initialize i18n when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            await window.i18n.init('en');
+            console.log('i18n initialized');
+        });
+    </script>
 </body>
 </html>

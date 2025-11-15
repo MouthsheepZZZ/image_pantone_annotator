@@ -1,0 +1,160 @@
+{
+  "header": {
+    "title": "Pantone Color Picker",
+    "subtitle": "Extract colors from images and match them to Pantone color cards"
+  },
+  "dropZone": {
+    "text": "Click to upload or drag & drop an image",
+    "hint": "Supports JPG, PNG, GIF, WebP",
+    "pasteHint": "Or press Ctrl+V to paste from clipboard"
+  },
+  "buttons": {
+    "newImage": "New Image",
+    "importJson": "Import JSON",
+    "exportJson": "Export JSON",
+    "exportImage": "Export Image",
+    "colorFilter": "Color Filter",
+    "settings": "Settings",
+    "undo": "Undo",
+    "clearAll": "Clear All"
+  },
+  "settings": {
+    "title": "Settings",
+    "swatchSize": "Swatch Size:",
+    "codeFontSize": "Code Font Size:",
+    "nameFontSize": "Name Font Size:",
+    "labelWidth": "Label Width:"
+  },
+  "colorFilter": {
+    "title": "Color Filter",
+    "systemTitle": "Pantone System (Single Selection)",
+    "allSystems": "All Systems",
+    "graphics": "Graphics (PMS)",
+    "fhi": "Fashion, Home + Interiors (FHI)",
+    "plastics": "Plastics",
+    "cardTypeTitle": "Card Type (Multiple Selection)",
+    "cardTypeHint": "Select a specific system to filter by card type",
+    "mainTypes": "Main Types",
+    "suffixFilters": "Suffix Filters (Intersection)",
+    "statsLoading": "Loading color database...",
+    "statsShowing": "Showing {filtered} of {total} colors",
+    "statsAllSystems": "(All Systems)",
+    "statsSystem": "({system})",
+    "statsTypes": ", {count} types selected",
+    "statsType": ", {count} type selected"
+  },
+  "instructions": {
+    "title": "How to Use",
+    "step1": "<strong>Upload an Image:</strong> Click the upload area or drag and drop your image file",
+    "step2": "<strong>Click to Extract Colors:</strong> Click anywhere on the image to extract the color at that point",
+    "step3": "<strong>View Pantone Match:</strong> The closest matching Pantone color will be displayed with a color swatch and code",
+    "step4": "<strong>Drag to Reposition:</strong> Click and drag any color swatch or sampling point to move it freely",
+    "step5": "<strong>Filter Colors:</strong> Click \"Color Filter\" to select specific Pantone systems and card types for matching",
+    "step6": "<strong>Customize Display:</strong> Click \"Settings\" to adjust swatch size and font sizes to your preference",
+    "step7": "<strong>Add Multiple Points:</strong> Click multiple locations to create a color palette from your image",
+    "step8": "<strong>Export Image:</strong> Click \"Export Image\" to download the annotated image with all color labels",
+    "step9": "<strong>Export JSON:</strong> Click \"Export JSON\" to save color point data with coordinates for later use",
+    "step10": "<strong>Import JSON:</strong> Click \"Import JSON\" to restore previously saved color points and their positions"
+  },
+  "features": {
+    "accurateMatching": {
+      "title": "Accurate Matching",
+      "desc": "Uses Delta E algorithm for precise color matching to Pantone database"
+    },
+    "visualAnnotations": {
+      "title": "Visual Annotations",
+      "desc": "Beautiful color swatches with connecting lines and labels"
+    },
+    "draggableElements": {
+      "title": "Draggable Elements",
+      "desc": "Move swatches and sampling points freely with mouse"
+    },
+    "colorFiltering": {
+      "title": "Color Filtering",
+      "desc": "Filter by Pantone system (Graphics/FHI/Plastics) and card types"
+    },
+    "customizable": {
+      "title": "Customizable",
+      "desc": "Adjust swatch size and font sizes to your preference"
+    },
+    "easyExport": {
+      "title": "Easy Export",
+      "desc": "Download your annotated image with one click"
+    },
+    "saveLoad": {
+      "title": "Save & Load",
+      "desc": "Export/import color points as JSON for reuse"
+    },
+    "fastResponsive": {
+      "title": "Fast & Responsive",
+      "desc": "Instant color extraction and matching"
+    }
+  },
+  "similarColors": {
+    "title": "Find Similar Colors",
+    "subtitle": "Discover alternative Pantone colors close to your selection",
+    "currentSelection": "Current Selection",
+    "threshold": "Threshold:",
+    "selectButton": "Select",
+    "cancel": "Cancel",
+    "noResults": "No similar colors found",
+    "noResultsHint": "Try increasing the threshold to see more colors",
+    "deltaE": "ΔE: {value}"
+  },
+  "alerts": {
+    "selectImageFile": "Please select an image file",
+    "pantoneLoading": "Pantone color database is still loading. Please wait a moment and try again.",
+    "clearConfirm": "Clear all color points?",
+    "pantoneLoadError": "Failed to load Pantone color database. Please ensure pantone_data.json is accessible and the server is running.",
+    "selectExportOption": "Please select at least one export option",
+    "copiedToClipboard": "Image copied to clipboard!",
+    "clipboardError": "Failed to copy to clipboard. Your browser may not support this feature.",
+    "exportError": "Failed to export image",
+    "uploadImageFirst": "Please upload an image first.",
+    "enterFilename": "Please enter a filename",
+    "fileSaved": "File saved successfully!",
+    "imageFromClipboard": "Image loaded from clipboard",
+    "dimensionMismatch": "Warning: Image dimensions don't match.\nJSON: {jsonWidth}x{jsonHeight}\nCurrent: {canvasWidth}x{canvasHeight}\n\nColor points may not align correctly. Continue anyway?",
+    "replacePointsConfirm": "Found {importedCount} color points in JSON.\nYou currently have {currentCount} color points.\n\nClick OK to REPLACE existing points\nClick Cancel to APPEND to existing points"
+  },
+  "cardTypes": {
+    "graphics": {
+      "solid": "Solid Colors (C/U)",
+      "colorbridge": "Color Bridge (CP/UP)",
+      "cmykguide": "CMYK Guide (P)",
+      "pastelsneons": "Pastels & Neons",
+      "metallics": "Metallics",
+      "extendedgamut": "Extended Gamut (XGC)",
+      "suffixc": "Coated (C)",
+      "suffixu": "Uncoated (U)"
+    },
+    "fhi": {
+      "cottonTcx": "Cotton (TCX)",
+      "paperTpg": "Paper (TPG)",
+      "paperTpx": "Paper (TPX)",
+      "polyesterTsx": "Polyester (TSX)",
+      "nylonTn": "Nylon (TN)"
+    },
+    "plastics": {
+      "plasticChips": "Plastic Chips (PQ/Q)"
+    }
+  },
+  "exportImage": {
+    "title": "Export Image Options",
+    "imageType": "Image Type:",
+    "fullImage": "Full Image",
+    "swatchesOnly": "Swatches Only (Transparent)",
+    "saveOptions": "Save Options:",
+    "downloadFile": "Download File",
+    "copyToClipboard": "Copy to Clipboard",
+    "cancel": "Cancel",
+    "export": "Export"
+  },
+  "exportJson": {
+    "title": "Export JSON Options",
+    "filename": "File Name:",
+    "saveLocationNote": "You will be able to choose the save location",
+    "cancel": "Cancel",
+    "export": "Export"
+  }
+}

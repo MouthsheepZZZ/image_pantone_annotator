@@ -21,16 +21,22 @@ window.COLOR_FILTER = {
 };
 
 // Card type definitions for each system
+// Graphics system uses two groups: main types and suffix filters
 const CARD_TYPE_DEFINITIONS = {
-    graphics: [
-        { id: 'formula-guide', name: 'Formula Guide (C/U)', pattern: /^\d+\s+[CU]$/ },
-        { id: 'cmyk-guide', name: 'CMYK Guide (P)', pattern: /^P\s+\d+-\d+\s+[CU]$/ },
-        { id: 'pastels', name: 'Pastels', pattern: /^9\d{3}\s+[CU]$/ },
-        { id: 'neons', name: 'Neons', pattern: /^[89]\d{2}\s+[CU]$/ },
-        { id: 'metallics-basic', name: 'Metallics (Basic)', pattern: /^8\d{3}\s+[CU]$/ },
-        { id: 'metallics-premium', name: 'Metallics (Premium)', pattern: /^10\d{3}\s+[CU]$/ },
-        { id: 'extended', name: 'Extended Colors (CP/XGC)', pattern: /^\d+\s+(CP|XGC)$/ }
-    ],
+    graphics: {
+        mainTypes: [
+            { id: 'solid', name: 'Solid Colors', pattern: /^\d+\s+[CU]$/ },
+            { id: 'color-bridge', name: 'Color Bridge (CP/UP)', pattern: /^\d+\s+(CP|UP)$/ },
+            { id: 'cmyk-guide', name: 'CMYK Guide (P)', pattern: /^P\s+\d+-\d+\s+[CU]$/ },
+            { id: 'pastels-neons', name: 'Pastels & Neons', pattern: /^(9\d{3}|[89]\d{2})\s+[CU]$/ },
+            { id: 'metallics', name: 'Metallics', pattern: /^(8\d{3}|10\d{3})\s+[CU]$/ },
+            { id: 'extended-gamut', name: 'Extended Gamut (XGC)', pattern: /^\d+\s+XGC$/ }
+        ],
+        suffixFilters: [
+            { id: 'suffix-c', name: 'Coated (C)', pattern: /\sC$/ },
+            { id: 'suffix-u', name: 'Uncoated (U)', pattern: /\sU$/ }
+        ]
+    },
     fhi: [
         { id: 'cotton-tcx', name: 'Cotton (TCX)', pattern: /^\d{2}-\d{4}\s+TCX$/ },
         { id: 'paper-tpg', name: 'Paper (TPG)', pattern: /^\d{2}-\d{4}\s+TPG$/ },
@@ -56,7 +62,7 @@ let dragState = {
 };
 
 // Initialize the application
-function initColorPicker() {
+async function initColorPicker() {
     canvas = document.getElementById('mainCanvas');
     ctx = canvas.getContext('2d');
     
@@ -64,7 +70,7 @@ function initColorPicker() {
     imageCtx = imageCanvas.getContext('2d');
     
     setupEventListeners();
-    loadPantoneData();
+    await loadPantoneData();
     resizeCanvas();
 }
 
@@ -106,10 +112,10 @@ function setupEventListeners() {
     document.getElementById('clearBtn').addEventListener('click', clearAllPoints);
     
     // Export button
-    document.getElementById('exportBtn').addEventListener('click', exportImage);
+    document.getElementById('exportBtn').addEventListener('click', showExportImageModal);
     
     // Export JSON button
-    document.getElementById('exportJsonBtn').addEventListener('click', exportJSON);
+    document.getElementById('exportJsonBtn').addEventListener('click', showExportJsonModal);
     
     // Import JSON button
     document.getElementById('importJsonBtn').addEventListener('click', () => {
@@ -139,6 +145,9 @@ function setupEventListeners() {
     // Setup color filter
     setupColorFilter();
     
+    // Paste event for clipboard images
+    document.addEventListener('paste', handlePaste);
+    
     // Window resize
     window.addEventListener('resize', resizeCanvas);
 }
@@ -151,10 +160,56 @@ function handleFileSelect(e) {
     }
 }
 
+// Handle paste event for clipboard images
+function handlePaste(e) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        
+        // Check if the item is an image
+        if (item.type.indexOf('image') !== -1) {
+            e.preventDefault();
+            const blob = item.getAsFile();
+            
+            if (blob) {
+                loadImageFromBlob(blob);
+                
+                // Show feedback message
+                const msg = window.i18n && window.i18n.t 
+                    ? window.i18n.t('alerts.imageFromClipboard') 
+                    : 'Image loaded from clipboard';
+                console.log(msg);
+            }
+            break;
+        }
+    }
+}
+
+// Load image from blob (for clipboard paste)
+function loadImageFromBlob(blob) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            uploadedImage = img;
+            document.getElementById('dropZone').style.display = 'none';
+            document.getElementById('canvasContainer').style.display = 'block';
+            document.getElementById('controls').style.display = 'flex';
+            colorPoints = [];
+            displayImage();
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(blob);
+}
+
 // Load image from file
 function loadImage(file) {
     if (!file.type.match('image.*')) {
-        alert('Please select an image file');
+        const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.selectImageFile') : 'Please select an image file';
+        alert(msg);
         return;
     }
     
@@ -249,7 +304,8 @@ function handleMouseDown(e) {
     } else {
         // Add new color point
         if (pantoneData.length === 0) {
-            alert('Pantone color database is still loading. Please wait a moment and try again.');
+            const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.pantoneLoading') : 'Pantone color database is still loading. Please wait a moment and try again.';
+            alert(msg);
             return;
         }
         
@@ -567,26 +623,39 @@ function drawAnnotation(point, index, hideDeleteButton = false) {
 }
 
 // Load Pantone data
-function loadPantoneData() {
+async function loadPantoneData() {
     console.log('Starting to load Pantone data...');
     
-    // Use embedded data from pantone_data.js
-    if (typeof PANTONE_DATA !== 'undefined' && PANTONE_DATA.set1) {
-        pantoneData = PANTONE_DATA.set1;
-        console.log(`✓ Successfully loaded ${pantoneData.length} Pantone colors`);
-        console.log('Sample color:', pantoneData[0]);
+    try {
+        const response = await fetch('pantone_data.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
-        // Initialize filtered data
-        applyColorFilter();
-    } else {
-        console.error('Pantone data not found. Please ensure pantone_data.js is loaded.');
-        alert('Failed to load Pantone color database. Please ensure pantone_data.js is included in the HTML.');
+        const data = await response.json();
+        if (data && data.set1) {
+            pantoneData = data.set1;
+            console.log(`✓ Successfully loaded ${pantoneData.length} Pantone colors from JSON`);
+            console.log('Sample color:', pantoneData[0]);
+            
+            // Initialize filtered data
+            applyColorFilter();
+        } else {
+            throw new Error('Invalid data format in pantone_data.json');
+        }
+    } catch (error) {
+        console.error('Failed to load Pantone data:', error);
+        const msg = window.i18n && window.i18n.t 
+            ? window.i18n.t('alerts.pantoneLoadError') 
+            : 'Failed to load Pantone color database. Please ensure pantone_data.json is accessible and the server is running.';
+        alert(msg);
     }
 }
 
 // Clear all points
 function clearAllPoints() {
-    if (confirm('Clear all color points?')) {
+    const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.clearConfirm') : 'Clear all color points?';
+    if (confirm(msg)) {
         colorPoints = [];
         redrawAnnotations();
     }
@@ -600,9 +669,45 @@ function undoLastPoint() {
     }
 }
 
-// Export annotated image
-function exportImage() {
+// Show export image modal
+function showExportImageModal() {
     if (!uploadedImage) return;
+    
+    const modal = document.getElementById('exportImageModal');
+    modal.classList.add('active');
+    
+    // Setup event listeners if not already setup
+    const confirmBtn = document.getElementById('exportImageConfirmBtn');
+    const cancelBtn = document.getElementById('exportImageCancelBtn');
+    
+    if (!confirmBtn.hasAttribute('data-listener-added')) {
+        confirmBtn.addEventListener('click', performImageExport);
+        confirmBtn.setAttribute('data-listener-added', 'true');
+        
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    }
+}
+
+// Perform image export with selected options
+async function performImageExport() {
+    const modal = document.getElementById('exportImageModal');
+    const exportType = document.querySelector('input[name="export-type"]:checked').value;
+    const shouldDownload = document.getElementById('export-download').checked;
+    const shouldCopyToClipboard = document.getElementById('export-clipboard').checked;
+    
+    if (!shouldDownload && !shouldCopyToClipboard) {
+        const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.selectExportOption') : 'Please select at least one export option';
+        alert(msg);
+        return;
+    }
     
     // Set exporting flag to hide delete buttons
     isExporting = true;
@@ -612,8 +717,13 @@ function exportImage() {
     exportCanvas.height = canvas.height;
     const exportCtx = exportCanvas.getContext('2d');
     
-    // Draw original image
-    exportCtx.drawImage(imageCanvas, 0, 0);
+    if (exportType === 'full') {
+        // Draw original image
+        exportCtx.drawImage(imageCanvas, 0, 0);
+    } else {
+        // Transparent background for swatches only
+        exportCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+    }
     
     // Redraw annotations without delete buttons
     const tempCtx = ctx;
@@ -626,15 +736,81 @@ function exportImage() {
     // Reset exporting flag
     isExporting = false;
     
-    // Download
-    exportCanvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = 'pantone_annotated_' + Date.now() + '.png';
-        link.href = url;
-        link.click();
-        URL.revokeObjectURL(url);
-    });
+    // Export based on selected options
+    try {
+        const blob = await new Promise(resolve => {
+            exportCanvas.toBlob(resolve);
+        });
+        
+        if (shouldDownload) {
+            const filename = exportType === 'full' 
+                ? 'pantone_annotated_' + Date.now() + '.png'
+                : 'pantone_swatches_' + Date.now() + '.png';
+            
+            // Try to use File System Access API for file picker
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: filename,
+                        types: [{
+                            description: 'PNG Images',
+                            accept: { 'image/png': ['.png'] }
+                        }]
+                    });
+                    
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    
+                    const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.fileSaved') : 'File saved successfully!';
+                    if (shouldCopyToClipboard) {
+                        // If also copying to clipboard, don't show alert yet
+                    } else {
+                        alert(msg);
+                    }
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error('File save failed:', err);
+                        // Fallback to default download
+                        downloadBlob(blob, filename);
+                    }
+                }
+            } else {
+                // Fallback for browsers that don't support File System Access API
+                downloadBlob(blob, filename);
+            }
+        }
+        
+        if (shouldCopyToClipboard) {
+            try {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.copiedToClipboard') : 'Image copied to clipboard!';
+                alert(msg);
+            } catch (err) {
+                console.error('Failed to copy to clipboard:', err);
+                const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.clipboardError') : 'Failed to copy to clipboard. Your browser may not support this feature.';
+                alert(msg);
+            }
+        }
+        
+        modal.classList.remove('active');
+    } catch (error) {
+        console.error('Export failed:', error);
+        const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.exportError') : 'Failed to export image';
+        alert(msg);
+    }
+}
+
+// Helper function to download blob (fallback method)
+function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = url;
+    link.click();
+    URL.revokeObjectURL(url);
 }
 
 // Toggle config panel
@@ -709,33 +885,92 @@ function updateCardTypeOptions(system) {
     window.COLOR_FILTER.cardTypes = [];
     
     if (system === 'all') {
-        container.innerHTML = '<div style="padding: 10px; color: #666; font-size: 0.9em;">Select a specific system to filter by card type</div>';
+        const hint = window.i18n && window.i18n.t ? window.i18n.t('colorFilter.cardTypeHint') : 'Select a specific system to filter by card type';
+        container.innerHTML = `<div style="padding: 10px; color: #666; font-size: 0.9em;">${hint}</div>`;
         return;
     }
     
     const cardTypes = CARD_TYPE_DEFINITIONS[system];
     if (!cardTypes) return;
     
-    // Create checkbox for each card type
-    cardTypes.forEach(cardType => {
-        const option = document.createElement('div');
-        option.className = 'filter-checkbox-option';
+    // Handle graphics system with grouped layout
+    if (system === 'graphics' && cardTypes.mainTypes && cardTypes.suffixFilters) {
+        // Create main types section
+        const mainTypesSection = document.createElement('div');
+        mainTypesSection.className = 'filter-type-group';
         
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = `cardtype-${cardType.id}`;
-        checkbox.value = cardType.id;
-        checkbox.addEventListener('change', handleCardTypeFilterChange);
+        const mainTypesLabel = document.createElement('div');
+        mainTypesLabel.className = 'filter-section-subtitle';
+        mainTypesLabel.setAttribute('data-i18n', 'colorFilter.mainTypes');
+        mainTypesLabel.textContent = 'Main Types';
+        mainTypesSection.appendChild(mainTypesLabel);
         
-        const label = document.createElement('label');
-        label.className = 'filter-checkbox-label';
-        label.htmlFor = `cardtype-${cardType.id}`;
-        label.textContent = cardType.name;
+        const mainTypesGrid = document.createElement('div');
+        mainTypesGrid.className = 'filter-checkbox-group';
+        cardTypes.mainTypes.forEach(cardType => {
+            const option = createCheckboxOption(cardType, system);
+            mainTypesGrid.appendChild(option);
+        });
+        mainTypesSection.appendChild(mainTypesGrid);
+        container.appendChild(mainTypesSection);
         
-        option.appendChild(checkbox);
-        option.appendChild(label);
-        container.appendChild(option);
-    });
+        // Create suffix filters section
+        const suffixSection = document.createElement('div');
+        suffixSection.className = 'filter-type-group';
+        
+        const suffixFiltersLabel = document.createElement('div');
+        suffixFiltersLabel.className = 'filter-section-subtitle';
+        suffixFiltersLabel.setAttribute('data-i18n', 'colorFilter.suffixFilters');
+        suffixFiltersLabel.textContent = 'Suffix Filters (Intersection)';
+        suffixSection.appendChild(suffixFiltersLabel);
+        
+        const suffixGrid = document.createElement('div');
+        suffixGrid.className = 'filter-checkbox-group';
+        cardTypes.suffixFilters.forEach(cardType => {
+            const option = createCheckboxOption(cardType, system);
+            suffixGrid.appendChild(option);
+        });
+        suffixSection.appendChild(suffixGrid);
+        container.appendChild(suffixSection);
+        
+        // Apply i18n translations to the newly created elements
+        if (window.i18n && window.i18n.updateContent) {
+            window.i18n.updateContent();
+        }
+    } else {
+        // Handle other systems (fhi, plastics) - simple list
+        const cardTypeList = Array.isArray(cardTypes) ? cardTypes : [];
+        cardTypeList.forEach(cardType => {
+            const option = createCheckboxOption(cardType, system);
+            container.appendChild(option);
+        });
+    }
+}
+
+// Helper function to create checkbox option
+function createCheckboxOption(cardType, system) {
+    const option = document.createElement('div');
+    option.className = 'filter-checkbox-option';
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `cardtype-${cardType.id}`;
+    checkbox.value = cardType.id;
+    checkbox.addEventListener('change', handleCardTypeFilterChange);
+    
+    const label = document.createElement('label');
+    label.className = 'filter-checkbox-label';
+    label.htmlFor = `cardtype-${cardType.id}`;
+    
+    // Get translated name from i18n
+    const cardTypeKey = `cardTypes.${system}.${cardType.id.replace(/-/g, '')}`;
+    const translation = window.i18n && window.i18n.t ? window.i18n.t(cardTypeKey) : null;
+    label.textContent = (translation && translation !== cardTypeKey) ? translation : cardType.name;
+    
+    option.appendChild(checkbox);
+    option.appendChild(label);
+    
+    return option;
 }
 
 // Handle card type filter change
@@ -762,8 +997,53 @@ function applyColorFilter() {
     } else if (system === 'all') {
         // Should not happen, but handle it
         filteredPantoneData = pantoneData;
+    } else if (system === 'graphics') {
+        // Special handling for graphics system with main types and suffix filters
+        const systemDef = CARD_TYPE_DEFINITIONS[system];
+        
+        if (!systemDef || !systemDef.mainTypes || !systemDef.suffixFilters) {
+            filteredPantoneData = pantoneData;
+            updateFilterStats();
+            return;
+        }
+        
+        // Separate selected card types into main types and suffix filters
+        const selectedMainTypes = cardTypes.filter(id => 
+            systemDef.mainTypes.some(mt => mt.id === id)
+        );
+        const selectedSuffixes = cardTypes.filter(id => 
+            systemDef.suffixFilters.some(sf => sf.id === id)
+        );
+        
+        if (selectedMainTypes.length === 0 && selectedSuffixes.length === 0) {
+            // No filters selected, show all colors in graphics system
+            const allPatterns = [...systemDef.mainTypes, ...systemDef.suffixFilters];
+            filteredPantoneData = pantoneData.filter(color => {
+                return allPatterns.some(cardType => cardType.pattern.test(color.code));
+            });
+        } else {
+            // Apply filters with intersection logic
+            filteredPantoneData = pantoneData.filter(color => {
+                // First check main types (OR logic)
+                let mainTypeMatch = selectedMainTypes.length === 0; // If no main types selected, pass
+                if (!mainTypeMatch) {
+                    const mainTypePatterns = systemDef.mainTypes.filter(mt => selectedMainTypes.includes(mt.id));
+                    mainTypeMatch = mainTypePatterns.some(cardType => cardType.pattern.test(color.code));
+                }
+                
+                // Then check suffix filters (AND logic)
+                let suffixMatch = selectedSuffixes.length === 0; // If no suffixes selected, pass
+                if (!suffixMatch) {
+                    const suffixPatterns = systemDef.suffixFilters.filter(sf => selectedSuffixes.includes(sf.id));
+                    suffixMatch = suffixPatterns.some(cardType => cardType.pattern.test(color.code));
+                }
+                
+                // Both conditions must be true (intersection)
+                return mainTypeMatch && suffixMatch;
+            });
+        }
     } else {
-        // Filter by system and optionally by card types
+        // Handle other systems (fhi, plastics) - simple OR logic
         const systemCardTypes = CARD_TYPE_DEFINITIONS[system];
         
         if (cardTypes.length === 0) {
@@ -790,32 +1070,61 @@ function updateFilterStats() {
     const total = pantoneData.length;
     const filtered = filteredPantoneData.length;
     
+    // Check if i18n is available
+    if (!window.i18n || !window.i18n.t) {
+        statsElement.textContent = total === 0 ? 'Loading color database...' : `Showing ${filtered.toLocaleString()} of ${total.toLocaleString()} colors`;
+        return;
+    }
+    
     if (total === 0) {
-        statsElement.textContent = 'Loading color database...';
+        statsElement.textContent = window.i18n.t('colorFilter.statsLoading');
         return;
     }
     
     const system = window.COLOR_FILTER.system;
     const cardTypes = window.COLOR_FILTER.cardTypes;
     
-    let message = `Showing ${filtered.toLocaleString()} of ${total.toLocaleString()} colors`;
+    let message = window.i18n.t('colorFilter.statsShowing', {
+        filtered: filtered.toLocaleString(),
+        total: total.toLocaleString()
+    });
     
     if (system === 'all') {
-        message += ' (All Systems)';
+        message += ' ' + window.i18n.t('colorFilter.statsAllSystems');
     } else {
         const systemName = system === 'graphics' ? 'Graphics' : 
                           system === 'fhi' ? 'FHI' : 
                           system === 'plastics' ? 'Plastics' : system;
-        message += ` (${systemName}`;
+        message += ' ' + window.i18n.t('colorFilter.statsSystem', { system: systemName });
         
         if (cardTypes.length > 0) {
-            message += `, ${cardTypes.length} type${cardTypes.length > 1 ? 's' : ''} selected`;
+            const typeKey = cardTypes.length > 1 ? 'colorFilter.statsTypes' : 'colorFilter.statsType';
+            message += window.i18n.t(typeKey, { count: cardTypes.length });
         }
-        message += ')';
     }
     
     statsElement.textContent = message;
 }
+
+// Listen for language changes and update filter stats
+window.addEventListener('languageChanged', () => {
+    updateFilterStats();
+    
+    // Update card type options with new translations
+    const system = window.COLOR_FILTER.system;
+    if (system !== 'all') {
+        updateCardTypeOptions(system);
+        
+        // Re-apply checked states
+        const selectedTypes = window.COLOR_FILTER.cardTypes;
+        selectedTypes.forEach(typeId => {
+            const checkbox = document.getElementById(`cardtype-${typeId}`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+    }
+});
 
 // ===== Similar Colors Modal Functions =====
 
@@ -926,16 +1235,20 @@ function findSimilarColors(targetPantone, searchData, threshold) {
     return similar.slice(0, 50);
 }
 
-// Render similar colors in grid
+// Render similar colors in the modal
 function renderSimilarColors(similarColors, currentPantone) {
     const grid = document.getElementById('similarColorsGrid');
+    grid.innerHTML = '';
     
     if (similarColors.length === 0) {
+        const noResultsText = window.i18n && window.i18n.t ? window.i18n.t('similarColors.noResults') : 'No similar colors found';
+        const hintText = window.i18n && window.i18n.t ? window.i18n.t('similarColors.noResultsHint') : 'Try increasing the threshold to see more colors';
+        
         grid.innerHTML = `
             <div class="no-results">
                 <div class="no-results-icon">🔍</div>
-                <div>No similar colors found within this threshold.</div>
-                <div style="margin-top: 10px; font-size: 0.9em;">Try increasing the threshold value.</div>
+                <p>${noResultsText}</p>
+                <small>${hintText}</small>
             </div>
         `;
         return;
@@ -950,12 +1263,19 @@ function renderSimilarColors(similarColors, currentPantone) {
         // Clean up code display
         const displayCode = pantone.code.replace(/\s+(TCX|TPX|TN|TPG|TSX|C|U|CP|XGC|PQ|Q)$/i, (match) => ` ${match.trim()}`);
         
+        const deltaText = window.i18n && window.i18n.t ? 
+            window.i18n.t('similarColors.deltaE', { value: pantone.deltaE.toFixed(2) }) : 
+            `ΔE: ${pantone.deltaE.toFixed(2)}`;
+        const selectText = window.i18n && window.i18n.t ? 
+            window.i18n.t('similarColors.selectButton') : 
+            'Select';
+        
         card.innerHTML = `
             <div class="color-card-swatch" style="background-color: ${pantone.hex};"></div>
             <div class="color-card-code">${displayCode}</div>
             <div class="color-card-name">${pantone.name}</div>
-            <div class="color-card-delta">ΔE: ${pantone.deltaE.toFixed(2)}</div>
-            <button class="color-card-select" data-code="${pantone.code}">Select</button>
+            <div class="color-card-delta">${deltaText}</div>
+            <button class="color-card-select" data-code="${pantone.code}">${selectText}</button>
         `;
         
         // Add click handler to select button
@@ -987,16 +1307,64 @@ function replacePantoneColor(newPantone) {
     }, 200);
 }
 
-// Export color points as JSON
-function exportJSON() {
-    if (!uploadedImage || colorPoints.length === 0) {
-        alert('No color points to export. Please add some color points first.');
+// Show export JSON modal
+function showExportJsonModal() {
+    if (!uploadedImage) {
+        const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.uploadImageFirst') : 'Please upload an image first.';
+        alert(msg);
         return;
     }
     
+    const modal = document.getElementById('exportJsonModal');
+    modal.classList.add('active');
+    
+    // Set default filename based on current timestamp
+    const filenameInput = document.getElementById('json-filename');
+    if (!filenameInput.value || filenameInput.value === 'pantone_project') {
+        filenameInput.value = 'pantone_project_' + new Date().toISOString().split('T')[0];
+    }
+    
+    // Setup event listeners if not already setup
+    const confirmBtn = document.getElementById('exportJsonConfirmBtn');
+    const cancelBtn = document.getElementById('exportJsonCancelBtn');
+    
+    if (!confirmBtn.hasAttribute('data-listener-added')) {
+        confirmBtn.addEventListener('click', performJsonExport);
+        confirmBtn.setAttribute('data-listener-added', 'true');
+        
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    }
+}
+
+// Perform JSON export with selected options
+async function performJsonExport() {
+    const modal = document.getElementById('exportJsonModal');
+    let filename = document.getElementById('json-filename').value.trim();
+    
+    if (!filename) {
+        const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.enterFilename') : 'Please enter a filename';
+        alert(msg);
+        return;
+    }
+    
+    // Remove .json extension if user added it
+    if (filename.toLowerCase().endsWith('.json')) {
+        filename = filename.slice(0, -5);
+    }
+    
     const exportData = {
-        version: '1.0',
+        version: '1.1',
         timestamp: new Date().toISOString(),
+        settings: window.SWATCH_CONFIG,
+        colorFilter: window.COLOR_FILTER,
         imageInfo: {
             width: canvas.width,
             height: canvas.height
@@ -1022,18 +1390,46 @@ function exportJSON() {
             }
         }))
     };
-    
-    // Create JSON blob and download
+
+    // Create JSON blob
     const jsonString = JSON.stringify(exportData, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = 'pantone_colors_' + Date.now() + '.json';
-    link.href = url;
-    link.click();
-    URL.revokeObjectURL(url);
     
-    console.log('Exported JSON with', colorPoints.length, 'color points');
+    // Try to use File System Access API for file picker
+    if (window.showSaveFilePicker) {
+        try {
+            const handle = await window.showSaveFilePicker({
+                suggestedName: filename + '.json',
+                types: [{
+                    description: 'JSON Files',
+                    accept: { 'application/json': ['.json'] }
+                }]
+            });
+            
+            const writable = await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            
+            console.log('Exported JSON with settings, filter, and', colorPoints.length, 'color points');
+            
+            const msg = window.i18n && window.i18n.t ? window.i18n.t('alerts.fileSaved') : 'File saved successfully!';
+            alert(msg);
+            
+            modal.classList.remove('active');
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                console.error('File save failed:', err);
+                // Fallback to default download
+                downloadBlob(blob, filename + '.json');
+                modal.classList.remove('active');
+            }
+        }
+    } else {
+        // Fallback for browsers that don't support File System Access API
+        downloadBlob(blob, filename + '.json');
+        console.log('Exported JSON with settings, filter, and', colorPoints.length, 'color points');
+        modal.classList.remove('active');
+    }
 }
 
 // Handle JSON file selection
@@ -1049,106 +1445,155 @@ function handleJsonFileSelect(e) {
 // Import color points from JSON
 function importJSON(file) {
     if (!uploadedImage) {
-        alert('Please load an image first before importing color points.');
+        alert('Please load an image first before importing a project file.');
         return;
     }
-    
+
     const reader = new FileReader();
     reader.onload = (e) => {
         try {
             const importData = JSON.parse(e.target.result);
-            
-            // Validate JSON structure
-            if (!importData.colorPoints || !Array.isArray(importData.colorPoints)) {
-                throw new Error('Invalid JSON format: missing colorPoints array');
+
+            // --- Apply Settings and Filters First ---
+            if (importData.settings) {
+                applyImportedSettings(importData.settings);
             }
-            
-            // Validate image dimensions if present
-            if (importData.imageInfo) {
-                const widthMatch = Math.abs(canvas.width - importData.imageInfo.width) < 5;
-                const heightMatch = Math.abs(canvas.height - importData.imageInfo.height) < 5;
-                
-                if (!widthMatch || !heightMatch) {
-                    const proceed = confirm(
-                        `Warning: Image dimensions don't match.\n` +
-                        `JSON: ${importData.imageInfo.width}x${importData.imageInfo.height}\n` +
-                        `Current: ${canvas.width}x${canvas.height}\n\n` +
-                        `Color points may not align correctly. Continue anyway?`
-                    );
-                    
-                    if (!proceed) return;
-                }
+            if (importData.colorFilter) {
+                applyImportedColorFilter(importData.colorFilter);
             }
-            
-            // Convert imported data to colorPoints format
+
+            // --- Then Handle Color Points ---
             const importedPoints = [];
-            for (const point of importData.colorPoints) {
-                // Validate required fields
-                if (!point.position || !point.swatchPosition || !point.pantone) {
-                    console.warn('Skipping invalid color point:', point);
-                    continue;
+            if (importData.colorPoints && Array.isArray(importData.colorPoints)) {
+                // Validate image dimensions if present
+                if (importData.imageInfo) {
+                    const widthMatch = Math.abs(canvas.width - importData.imageInfo.width) < 5;
+                    const heightMatch = Math.abs(canvas.height - importData.imageInfo.height) < 5;
+
+                    if (!widthMatch || !heightMatch) {
+                        const proceed = confirm(window.i18n.t('alerts.dimensionMismatch', {
+                            jsonWidth: importData.imageInfo.width,
+                            jsonHeight: importData.imageInfo.height,
+                            canvasWidth: canvas.width,
+                            canvasHeight: canvas.height
+                        }));
+                        if (!proceed) return;
+                    }
                 }
-                
-                // Find the pantone color in our database to get complete info
-                let pantoneMatch = pantoneData.find(p => p.code === point.pantone.code);
-                
-                // If not found, use the imported pantone data
-                if (!pantoneMatch) {
-                    pantoneMatch = {
-                        code: point.pantone.code,
-                        name: point.pantone.name,
-                        hex: point.pantone.hex
-                    };
+
+                // Convert imported data to colorPoints format
+                for (const point of importData.colorPoints) {
+                    if (!point.position || !point.swatchPosition || !point.pantone) {
+                        console.warn('Skipping invalid color point:', point);
+                        continue;
+                    }
+
+                    let pantoneMatch = pantoneData.find(p => p.code === point.pantone.code) || { ...point.pantone };
+
+                    importedPoints.push({
+                        x: point.position.x,
+                        y: point.position.y,
+                        swatchX: point.swatchPosition.x,
+                        swatchY: point.swatchPosition.y,
+                        rgb: point.sampledColor || { r: 0, g: 0, b: 0 },
+                        pantone: pantoneMatch
+                    });
                 }
-                
-                importedPoints.push({
-                    x: point.position.x,
-                    y: point.position.y,
-                    swatchX: point.swatchPosition.x,
-                    swatchY: point.swatchPosition.y,
-                    rgb: point.sampledColor || { r: 0, g: 0, b: 0 },
-                    pantone: pantoneMatch
-                });
             }
-            
-            if (importedPoints.length === 0) {
-                alert('No valid color points found in JSON file.');
-                return;
+
+            if (importedPoints.length === 0 && importData.colorPoints && importData.colorPoints.length > 0) {
+                alert('No valid color points could be processed from the JSON file.');
             }
-            
+
             // Ask user if they want to replace or append
             let shouldReplace = true;
-            if (colorPoints.length > 0) {
-                const choice = confirm(
-                    `Found ${importedPoints.length} color points in JSON.\n` +
-                    `You currently have ${colorPoints.length} color points.\n\n` +
-                    `Click OK to REPLACE existing points\n` +
-                    `Click Cancel to ADD to existing points`
-                );
+            if (colorPoints.length > 0 && importedPoints.length > 0) {
+                const msg = window.i18n.t('alerts.replacePointsConfirm', {
+                    importedCount: importedPoints.length,
+                    currentCount: colorPoints.length
+                });
+                const choice = confirm(msg);
                 shouldReplace = choice;
             }
-            
+
             if (shouldReplace) {
                 colorPoints = importedPoints;
             } else {
                 colorPoints.push(...importedPoints);
             }
-            
+
             redrawAnnotations();
-            console.log('Successfully imported', importedPoints.length, 'color points');
-            alert(`Successfully imported ${importedPoints.length} color points!`);
-            
+            console.log('Successfully imported project file.');
+            alert(`Successfully imported settings, filters, and ${importedPoints.length} color points!`);
+
         } catch (error) {
             console.error('Failed to import JSON:', error);
             alert('Failed to import JSON file: ' + error.message);
         }
     };
-    
+
     reader.onerror = () => {
         alert('Failed to read JSON file.');
     };
-    
+
     reader.readAsText(file);
+}
+
+// ===== Import Helper Functions =====
+
+function applyImportedSettings(settings) {
+    // Update global config, merging with existing to preserve defaults
+    window.SWATCH_CONFIG = { ...window.SWATCH_CONFIG, ...settings };
+
+    // Update UI sliders and displays
+    const sliders = [
+        { id: 'swatchSize', prop: 'swatchSize', displayId: 'swatchSizeValue' },
+        { id: 'fontSize', prop: 'fontSize', displayId: 'fontSizeValue' },
+        { id: 'nameFontSize', prop: 'nameFontSize', displayId: 'nameFontSizeValue' },
+        { id: 'labelWidth', prop: 'labelWidth', displayId: 'labelWidthValue' }
+    ];
+
+    sliders.forEach(slider => {
+        const value = window.SWATCH_CONFIG[slider.prop];
+        if (value !== undefined) {
+            const element = document.getElementById(slider.id + 'Slider');
+            const display = document.getElementById(slider.displayId);
+            if (element) element.value = value;
+            if (display) display.textContent = value;
+        }
+    });
+
+    console.log('Applied imported settings:', window.SWATCH_CONFIG);
+}
+
+function applyImportedColorFilter(filter) {
+    // Update global filter object
+    window.COLOR_FILTER = { ...window.COLOR_FILTER, ...filter };
+
+    // Update UI
+    // 1. System radio button
+    const systemRadio = document.querySelector(`input[name="pantone-system"][value="${filter.system}"]`);
+    if (systemRadio) {
+        systemRadio.checked = true;
+    }
+
+    // 2. Update card type options for the selected system
+    updateCardTypeOptions(filter.system);
+
+    // 3. Check the correct card type checkboxes
+    if (filter.cardTypes && Array.isArray(filter.cardTypes)) {
+        filter.cardTypes.forEach(typeId => {
+            const checkbox = document.getElementById(`cardtype-${typeId}`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+    }
+
+    // 4. Apply the filter to the dataset
+    applyColorFilter();
+
+    console.log('Applied imported color filter:', window.COLOR_FILTER);
 }
 
 // Initialize when DOM is ready
