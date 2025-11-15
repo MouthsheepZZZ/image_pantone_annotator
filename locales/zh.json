@@ -53,13 +53,14 @@
     "step1": "<strong>上传图片：</strong>点击上传区域或拖放图片文件",
     "step2": "<strong>点击提取颜色：</strong>点击图片上的任意位置提取该点的颜色",
     "step3": "<strong>查看 Pantone 匹配：</strong>最接近的 Pantone 颜色将显示色块和代码",
-    "step4": "<strong>拖动重新定位：</strong>点击并拖动任何色块或采样点以自由移动",
-    "step5": "<strong>筛选颜色：</strong>点击「颜色筛选」以选择特定的 Pantone 系统和色卡类型进行匹配",
-    "step6": "<strong>自定义显示：</strong>点击「设置」以调整色块大小和字体大小",
-    "step7": "<strong>添加多个点：</strong>点击多个位置以从图片创建调色板",
-    "step8": "<strong>导出图片：</strong>点击「导出图片」以下载带有所有颜色标签的注释图片",
-    "step9": "<strong>导出 JSON：</strong>点击「导出 JSON」以保存颜色点数据和坐标供以后使用",
-    "step10": "<strong>导入 JSON：</strong>点击「导入 JSON」以恢复之前保存的颜色点及其位置"
+    "step4": "<strong>平移和缩放：</strong>使用鼠标右键/中键平移图像，使用滚轮缩放。",
+    "step5": "<strong>拖动重新定位：</strong>点击并拖动任何色块或采样点以自由移动",
+    "step6": "<strong>筛选颜色：</strong>点击「颜色筛选」以选择特定的 Pantone 系统和色卡类型进行匹配",
+    "step7": "<strong>自定义显示：</strong>点击「设置」以调整色块大小和字体大小",
+    "step8": "<strong>添加多个点：</strong>点击多个位置以从图片创建调色板",
+    "step9": "<strong>导出图片：</strong>点击「导出图片」以下载带有所有颜色标签的注释图片",
+    "step10": "<strong>导出 JSON：</strong>点击「导出 JSON」以保存颜色点数据和坐标供以后使用",
+    "step11": "<strong>导入 JSON：</strong>点击「导入 JSON」以恢复之前保存的颜色点及其位置"
   },
   "features": {
     "accurateMatching": {

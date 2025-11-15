@@ -958,11 +958,31 @@ function downloadBlob(blob, filename) {
 
 // Toggle config panel
 function toggleConfigPanel() {
-    const panel = document.getElementById('configPanel');
-    if (panel.style.display === 'none' || panel.style.display === '') {
-        panel.style.display = 'block';
-    } else {
-        panel.style.display = 'none';
+    const modal = document.getElementById('settingsModal');
+    modal.classList.add('active');
+    
+    // Setup event listeners if not already setup
+    const cancelBtn = document.getElementById('settingsCancelBtn');
+    
+    if (!cancelBtn.hasAttribute('data-listener-added')) {
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        cancelBtn.setAttribute('data-listener-added', 'true');
+        
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+        
+        // Close on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                modal.classList.remove('active');
+            }
+        });
     }
 }
 
@@ -1108,11 +1128,31 @@ function setupConfigSliders() {
 
 // Toggle color filter panel
 function toggleColorFilterPanel() {
-    const panel = document.getElementById('colorFilterPanel');
-    if (panel.style.display === 'none' || panel.style.display === '') {
-        panel.style.display = 'block';
-    } else {
-        panel.style.display = 'none';
+    const modal = document.getElementById('colorFilterModal');
+    modal.classList.add('active');
+    
+    // Setup event listeners if not already setup
+    const cancelBtn = document.getElementById('colorFilterCancelBtn');
+    
+    if (!cancelBtn.hasAttribute('data-listener-added')) {
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        cancelBtn.setAttribute('data-listener-added', 'true');
+        
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+        
+        // Close on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                modal.classList.remove('active');
+            }
+        });
     }
 }
 
@@ -1581,12 +1621,10 @@ function renderSimilarColors(similarColors, currentPantone) {
             <div class="color-card-code">${displayCode}</div>
             <div class="color-card-name">${pantone.name}</div>
             <div class="color-card-delta">${deltaText}</div>
-            <button class="color-card-select" data-code="${pantone.code}">${selectText}</button>
         `;
         
-        // Add click handler to select button
-        const selectBtn = card.querySelector('.color-card-select');
-        selectBtn.addEventListener('click', () => {
+        // Add click handler to the entire card
+        card.addEventListener('click', () => {
             replacePantoneColor(pantone);
         });
         
@@ -1604,12 +1642,17 @@ function replacePantoneColor(newPantone) {
     // Redraw annotations
     redrawAnnotations();
     
-    // Close modal with animation feedback
+    // Close modal with smooth animation
     const modal = document.getElementById('similarColorsModal');
-    modal.style.opacity = '0.8';
+    const modalContent = modal.querySelector('.similar-colors-modal');
+    
+    // Add closing animation class
+    modalContent.style.animation = 'slideDown 0.2s ease forwards';
+    
     setTimeout(() => {
         closeSimilarColorsModal();
-        modal.style.opacity = '1';
+        // Reset animation for next open
+        modalContent.style.animation = '';
     }, 200);
 }
 

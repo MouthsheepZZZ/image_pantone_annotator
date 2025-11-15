@@ -53,13 +53,14 @@
     "step1": "<strong>Upload an Image:</strong> Click the upload area or drag and drop your image file",
     "step2": "<strong>Click to Extract Colors:</strong> Click anywhere on the image to extract the color at that point",
     "step3": "<strong>View Pantone Match:</strong> The closest matching Pantone color will be displayed with a color swatch and code",
-    "step4": "<strong>Drag to Reposition:</strong> Click and drag any color swatch or sampling point to move it freely",
-    "step5": "<strong>Filter Colors:</strong> Click \"Color Filter\" to select specific Pantone systems and card types for matching",
-    "step6": "<strong>Customize Display:</strong> Click \"Settings\" to adjust swatch size and font sizes to your preference",
-    "step7": "<strong>Add Multiple Points:</strong> Click multiple locations to create a color palette from your image",
-    "step8": "<strong>Export Image:</strong> Click \"Export Image\" to download the annotated image with all color labels",
-    "step9": "<strong>Export JSON:</strong> Click \"Export JSON\" to save color point data with coordinates for later use",
-    "step10": "<strong>Import JSON:</strong> Click \"Import JSON\" to restore previously saved color points and their positions"
+    "step4": "<strong>Pan and Zoom:</strong> Use the right/middle mouse button to pan the image, and the mouse wheel to zoom.",
+    "step5": "<strong>Drag to Reposition:</strong> Click and drag any color swatch or sampling point to move it freely",
+    "step6": "<strong>Filter Colors:</strong> Click \"Color Filter\" to select specific Pantone systems and card types for matching",
+    "step7": "<strong>Customize Display:</strong> Click \"Settings\" to adjust swatch size and font sizes to your preference",
+    "step8": "<strong>Add Multiple Points:</strong> Click multiple locations to create a color palette from your image",
+    "step9": "<strong>Export Image:</strong> Click \"Export Image\" to download the annotated image with all color labels",
+    "step10": "<strong>Export JSON:</strong> Click \"Export JSON\" to save color point data with coordinates for later use",
+    "step11": "<strong>Import JSON:</strong> Click \"Import JSON\" to restore previously saved color points and their positions"
   },
   "features": {
     "accurateMatching": {

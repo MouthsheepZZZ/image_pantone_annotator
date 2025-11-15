@@ -12,6 +12,7 @@ A professional web-based tool for extracting colors from images and matching the
 - **Accurate Pantone Matching**: Uses Delta E 2000 algorithm for superior color matching
 - **Visual Annotations**: Beautiful color swatches with connecting lines and labels
 - **Draggable Swatches**: Move color swatches and sampling points freely with mouse drag
+- **Image Pan & Zoom**: Pan the image with right/middle mouse button, and zoom with the mouse wheel
 - **Customizable Display**: Adjust swatch size and font sizes via settings panel
 - **Export Options**: Download annotated images or export color data as JSON
 - **Multiple Points**: Add multiple color points to create a complete color palette
@@ -92,6 +93,9 @@ Then open `http://localhost:8000/index.html` in your browser.
 
 ### Advanced Features
 
+- **Pan and Zoom**: After uploading an image, you can:
+  - **Pan**: Hold the right or middle mouse button and drag to move the image.
+  - **Zoom**: Use the mouse wheel to zoom in and out.
 - **Drag to reposition**: Click and drag any color swatch or sampling point to move it
 - **Find similar colors**: Click "Similar" button on any color swatch to explore alternatives
   - Each color swatch displays a split view: original color (left) vs Pantone match (right)

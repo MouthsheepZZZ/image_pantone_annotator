@@ -152,33 +152,72 @@
             pointer-events: auto;
         }
 
+        .controls-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 0;
+        }
+
         #controls {
             display: none;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 20px;
+            flex-direction: row;
+            justify-content: space-between;
             align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 1200px;
+            box-sizing: border-box;
+            margin-bottom: 0;
+        }
+
+        #canvasContainer {
+            display: none;
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 10px;
+            max-height: calc(100vh - 200px);
+            overflow: hidden;
+            cursor: default;
+            margin-top: 0;
+            box-sizing: border-box;
         }
 
         .control-group {
             display: flex;
-            gap: 15px;
+            gap: 6px;
             flex-wrap: wrap;
-            justify-content: center;
+            align-items: center;
+        }
+
+        .left-group {
+            justify-content: flex-start;
+        }
+
+        .right-group {
+            justify-content: flex-end;
         }
 
         .btn {
-            padding: 12px 30px;
+            padding: 6px 12px;
             border: none;
-            border-radius: 25px;
-            font-size: 1em;
+            border-radius: 16px;
+            font-size: 0.8em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
 
         .btn:hover {
@@ -290,22 +329,128 @@
             to { transform: rotate(360deg); }
         }
 
-        #configPanel {
+        /* Similar Colors Modal */
+        .modal-overlay {
             display: none;
-            background: rgba(255, 255, 255, 0.95);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .similar-colors-modal {
+            background: white;
             border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            max-width: 600px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
         }
 
-        #configPanel h3 {
-            color: #667eea;
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-title {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-subtitle {
+            font-size: 0.9em;
+            color: #666;
             margin-bottom: 15px;
-            font-size: 1.2em;
         }
 
+        .modal-body {
+            padding: 20px 30px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn-cancel {
+            background: #f3f4f6;
+            color: #555;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Config styles for modals */
         .config-row {
             display: flex;
             align-items: center;
@@ -348,16 +493,6 @@
             border: none;
         }
 
-        .config-row .value-display {
-            flex: 0 0 50px;
-            text-align: center;
-            font-weight: bold;
-            color: #667eea;
-            background: #f0f0f0;
-            padding: 5px 10px;
-            border-radius: 8px;
-        }
-
         .config-row .value-input {
             flex: 0 0 75px;
             text-align: center;
@@ -397,25 +532,7 @@
             appearance: textfield;
         }
 
-        #colorFilterPanel {
-            display: none;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            max-width: 700px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        #colorFilterPanel h3 {
-            color: #764ba2;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
+        /* Filter styles for modals */
         .filter-section {
             margin-bottom: 20px;
         }
@@ -554,74 +671,7 @@
             font-weight: 500;
         }
 
-        /* Similar Colors Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .similar-colors-modal {
-            background: white;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 700px;
-            max-height: 85vh;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            padding: 25px 30px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .modal-title {
-            font-size: 1.4em;
-            color: #333;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal-subtitle {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 15px;
-        }
-
+        /* Similar Colors Modal Specific Styles */
         .current-color-display {
             display: flex;
             align-items: center;
@@ -693,19 +743,21 @@
         .threshold-control {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            margin-bottom: 6px;
         }
 
         .threshold-control label {
             font-weight: 600;
             color: #555;
             flex: 0 0 auto;
+            font-size: 0.85em;
         }
 
         .threshold-control input[type="range"] {
             flex: 1;
-            height: 6px;
-            border-radius: 3px;
+            height: 4px;
+            border-radius: 2px;
             background: #ddd;
             outline: none;
             appearance: none;
@@ -715,48 +767,42 @@
         .threshold-control input[type="range"]::-webkit-slider-thumb {
             appearance: none;
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: #667eea;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
         }
 
         .threshold-control input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: #667eea;
             cursor: pointer;
             border: none;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
         }
 
         .threshold-value {
             font-weight: 700;
             color: #667eea;
-            font-size: 1.1em;
-            min-width: 45px;
+            font-size: 0.9em;
+            min-width: 40px;
             text-align: center;
-        }
-
-        .modal-body {
-            padding: 20px 30px;
-            overflow-y: auto;
-            flex: 1;
         }
 
         .color-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
         }
 
         .color-card {
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
             background: white;
@@ -775,9 +821,9 @@
 
         .color-card-swatch {
             width: 100%;
-            height: 80px;
-            border-radius: 6px;
-            margin-bottom: 10px;
+            height: 50px;
+            border-radius: 4px;
+            margin-bottom: 6px;
             border: 1px solid rgba(0, 0, 0, 0.1);
             position: relative;
         }
@@ -811,46 +857,26 @@
 
         .color-card-code {
             font-weight: 700;
-            font-size: 0.95em;
+            font-size: 0.8em;
             color: #333;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .color-card-name {
-            font-size: 0.8em;
+            font-size: 0.75em;
             color: #666;
-            margin-bottom: 8px;
-            line-height: 1.3;
-            min-height: 32px;
+            margin-bottom: 4px;
+            line-height: 1.1;
+            min-height: auto;
         }
 
         .color-card-delta {
-            font-size: 0.8em;
+            font-size: 0.7em;
             color: #667eea;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 0;
         }
 
-        .color-card-select {
-            width: 100%;
-            padding: 8px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .color-card-select:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-
-        .color-card.current-selection .color-card-select {
-            background: #10b981;
-        }
 
         .no-results {
             text-align: center;
@@ -861,42 +887,6 @@
         .no-results-icon {
             font-size: 3em;
             margin-bottom: 15px;
-        }
-
-        .modal-footer {
-            padding: 20px 30px;
-            border-top: 2px solid #f0f0f0;
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-        }
-
-        .modal-btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .modal-btn-cancel {
-            background: #f3f4f6;
-            color: #555;
-        }
-
-        .modal-btn-cancel:hover {
-            background: #e5e7eb;
-        }
-
-        .modal-btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .modal-btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
         /* Language Switcher */
@@ -1004,160 +994,80 @@
     <input type="file" id="fileInput" accept="image/*">
     <input type="file" id="jsonFileInput" accept="application/json,.json" style="display: none;">
 
+    <div class="controls-wrapper">
+        <div id="controls">
+            <div class="control-group left-group">
+                <button class="btn btn-success" onclick="location.reload()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    <span data-i18n="buttons.newImage">New Image</span>
+                </button>
+                <button class="btn btn-secondary" id="importJsonBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span data-i18n="buttons.importJson">Import JSON</span>
+                </button>
+                <button class="btn btn-primary" id="exportJsonBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <line x1="10" y1="9" x2="8" y2="9"></line>
+                    </svg>
+                    <span data-i18n="buttons.exportJson">Export JSON</span>
+                </button>
+                <button class="btn btn-primary" id="exportBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span data-i18n="buttons.exportImage">Export Image</span>
+                </button>
+            </div>
+            <div class="control-group right-group">
+                <button class="btn btn-secondary" id="colorFilterBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path>
+                    </svg>
+                    <span data-i18n="buttons.colorFilter">Color Filter</span>
+                </button>
+                <button class="btn btn-secondary" id="configBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m0-18a2 2 0 0 1 2 2v.4a2 2 0 0 0 1 1.7l2 1.2a2 2 0 0 1 1 1.7V8a2 2 0 0 1-2 2h-.4a2 2 0 0 0-1.7 1l-1.2 2a2 2 0 0 1-1.7 1H8a2 2 0 0 1-2-2v-.4a2 2 0 0 0-1-1.7l-2-1.2a2 2 0 0 1-1-1.7V8a2 2 0 0 1 2-2h.4a2 2 0 0 0 1.7-1l1.2-2a2 2 0 0 1 1.7-1z"></path>
+                    </svg>
+                    <span data-i18n="buttons.settings">Settings</span>
+                </button>
+                <button class="btn btn-secondary" id="undoBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="1 4 1 10 7 10"></polyline>
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                    </svg>
+                    <span data-i18n="buttons.undo">Undo</span>
+                </button>
+                <button class="btn btn-danger" id="clearBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span data-i18n="buttons.clearAll">Clear All</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="canvasContainer">
         <div class="canvas-wrapper">
             <canvas id="imageCanvas"></canvas>
             <canvas id="mainCanvas"></canvas>
-        </div>
-    </div>
-
-    <div id="configPanel">
-        <h3 data-i18n="settings.title">⚙️ Settings</h3>
-        <div class="config-row">
-            <label data-i18n="settings.swatchSize">Swatch Size:</label>
-            <input type="range" id="swatchSizeSlider" min="0" max="200" value="80" step="1">
-            <input type="number" class="value-input" id="swatchSizeValue" min="0" value="80" step="1">
-        </div>
-        <div class="config-row">
-            <label data-i18n="settings.codeFontSize">Code Font Size:</label>
-            <input type="range" id="fontSizeSlider" min="0" max="200" value="14" step="1">
-            <input type="number" class="value-input" id="fontSizeValue" min="0" value="14" step="1">
-        </div>
-        <div class="config-row">
-            <label data-i18n="settings.nameFontSize">Name Font Size:</label>
-            <input type="range" id="nameFontSizeSlider" min="0" max="200" value="11" step="1">
-            <input type="number" class="value-input" id="nameFontSizeValue" min="0" value="11" step="1">
-        </div>
-        <div class="config-row">
-            <label data-i18n="settings.labelWidth">Label Width:</label>
-            <input type="range" id="labelWidthSlider" min="0" max="200" value="100" step="1">
-            <input type="number" class="value-input" id="labelWidthValue" min="0" value="120" step="1">
-        </div>
-        
-        <h3 style="margin-top: 25px; font-size: 1.1em; color: #764ba2;" data-i18n="settings.colorMatchingTitle">🎨 Color Matching Weights</h3>
-        <p style="font-size: 0.85em; color: #666; margin-bottom: 15px;" data-i18n="settings.colorMatchingDesc">Lower values increase importance (Default: kL=0.3, kC=1.0, kH=1.0)</p>
-        
-        <div class="config-row">
-            <label data-i18n="settings.lightnessWeight">Lightness (kL):</label>
-            <input type="range" id="kLSlider" min="0.1" max="2.0" value="0.3" step="0.05">
-            <input type="number" class="value-input" id="kLValue" min="0.1" max="2.0" value="0.30" step="0.05">
-        </div>
-        <div class="config-row">
-            <label data-i18n="settings.chromaWeight">Chroma (kC):</label>
-            <input type="range" id="kCSlider" min="0.1" max="2.0" value="1.0" step="0.05">
-            <input type="number" class="value-input" id="kCValue" min="0.1" max="2.0" value="1.0" step="0.05">
-        </div>
-        <div class="config-row">
-            <label data-i18n="settings.hueWeight">Hue (kH):</label>
-            <input type="range" id="kHSlider" min="0.1" max="2.0" value="1.0" step="0.05">
-            <input type="number" class="value-input" id="kHValue" min="0.1" max="2.0" value="1.0" step="0.05">
-        </div>
-    </div>
-
-    <div id="colorFilterPanel">
-        <h3 data-i18n="colorFilter.title">🎨 Color Filter</h3>
-        
-        <div class="filter-section">
-            <div class="filter-section-title" data-i18n="colorFilter.systemTitle">Pantone System (Single Selection)</div>
-            <div class="filter-radio-group" id="systemFilterGroup">
-                <div class="filter-radio-option">
-                    <input type="radio" id="system-all" name="pantone-system" value="all" checked>
-                    <label class="filter-radio-label" for="system-all" data-i18n="colorFilter.allSystems">All Systems</label>
-                </div>
-                <div class="filter-radio-option">
-                    <input type="radio" id="system-graphics" name="pantone-system" value="graphics">
-                    <label class="filter-radio-label" for="system-graphics" data-i18n="colorFilter.graphics">Graphics (PMS)</label>
-                </div>
-                <div class="filter-radio-option">
-                    <input type="radio" id="system-fhi" name="pantone-system" value="fhi">
-                    <label class="filter-radio-label" for="system-fhi" data-i18n="colorFilter.fhi">Fashion, Home + Interiors (FHI)</label>
-                </div>
-                <div class="filter-radio-option">
-                    <input type="radio" id="system-plastics" name="pantone-system" value="plastics">
-                    <label class="filter-radio-label" for="system-plastics" data-i18n="colorFilter.plastics">Plastics</label>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-section">
-            <div class="filter-section-title" data-i18n="colorFilter.cardTypeTitle">Card Type (Multiple Selection)</div>
-            <div class="filter-checkbox-group" id="cardTypeFilterGroup">
-                <!-- Dynamic content will be loaded here based on system selection -->
-            </div>
-        </div>
-
-        <div class="filter-stats" id="filterStats">
-            Loading color database...
-        </div>
-    </div>
-
-    <div id="controls">
-        <div class="control-group">
-            <button class="btn btn-success" onclick="location.reload()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="23 4 23 10 17 10"></polyline>
-                    <polyline points="1 20 1 14 7 14"></polyline>
-                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                </svg>
-                <span data-i18n="buttons.newImage">New Image</span>
-            </button>
-        </div>
-        <div class="control-group">
-            <button class="btn btn-secondary" id="importJsonBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                <span data-i18n="buttons.importJson">Import JSON</span>
-            </button>
-            <button class="btn btn-primary" id="exportJsonBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <line x1="10" y1="9" x2="8" y2="9"></line>
-                </svg>
-                <span data-i18n="buttons.exportJson">Export JSON</span>
-            </button>
-            <button class="btn btn-primary" id="exportBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                <span data-i18n="buttons.exportImage">Export Image</span>
-            </button>
-        </div>
-        <div class="control-group">
-            <button class="btn btn-secondary" id="colorFilterBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path>
-                </svg>
-                <span data-i18n="buttons.colorFilter">Color Filter</span>
-            </button>
-            <button class="btn btn-secondary" id="configBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v6m0 6v6m0-18a2 2 0 0 1 2 2v.4a2 2 0 0 0 1 1.7l2 1.2a2 2 0 0 1 1 1.7V8a2 2 0 0 1-2 2h-.4a2 2 0 0 0-1.7 1l-1.2 2a2 2 0 0 1-1.7 1H8a2 2 0 0 1-2-2v-.4a2 2 0 0 0-1-1.7l-2-1.2a2 2 0 0 1-1-1.7V8a2 2 0 0 1 2-2h.4a2 2 0 0 0 1.7-1l1.2-2a2 2 0 0 1 1.7-1z"></path>
-                </svg>
-                <span data-i18n="buttons.settings">Settings</span>
-            </button>
-            <button class="btn btn-secondary" id="undoBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="1 4 1 10 7 10"></polyline>
-                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                </svg>
-                <span data-i18n="buttons.undo">Undo</span>
-            </button>
-            <button class="btn btn-danger" id="clearBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-                <span data-i18n="buttons.clearAll">Clear All</span>
-            </button>
         </div>
     </div>
 
@@ -1167,13 +1077,14 @@
             <li data-i18n-html="instructions.step1"><strong>Upload an Image:</strong> Click the upload area or drag and drop your image file</li>
             <li data-i18n-html="instructions.step2"><strong>Click to Extract Colors:</strong> Click anywhere on the image to extract the color at that point</li>
             <li data-i18n-html="instructions.step3"><strong>View Pantone Match:</strong> The closest matching Pantone color will be displayed with a color swatch and code</li>
-            <li data-i18n-html="instructions.step4"><strong>Drag to Reposition:</strong> Click and drag any color swatch or sampling point to move it freely</li>
-            <li data-i18n-html="instructions.step5"><strong>Filter Colors:</strong> Click "Color Filter" to select specific Pantone systems and card types for matching</li>
-            <li data-i18n-html="instructions.step6"><strong>Customize Display:</strong> Click "Settings" to adjust swatch size and font sizes to your preference</li>
-            <li data-i18n-html="instructions.step7"><strong>Add Multiple Points:</strong> Click multiple locations to create a color palette from your image</li>
-            <li data-i18n-html="instructions.step8"><strong>Export Image:</strong> Click "Export Image" to download the annotated image with all color labels</li>
-            <li data-i18n-html="instructions.step9"><strong>Export JSON:</strong> Click "Export JSON" to save color point data with coordinates for later use</li>
-            <li data-i18n-html="instructions.step10"><strong>Import JSON:</strong> Click "Import JSON" to restore previously saved color points and their positions</li>
+            <li data-i18n-html="instructions.step4"><strong>Pan and Zoom:</strong> Use the right/middle mouse button to pan the image, and the mouse wheel to zoom.</li>
+            <li data-i18n-html="instructions.step5"><strong>Drag to Reposition:</strong> Click and drag any color swatch or sampling point to move it freely</li>
+            <li data-i18n-html="instructions.step6"><strong>Filter Colors:</strong> Click "Color Filter" to select specific Pantone systems and card types for matching</li>
+            <li data-i18n-html="instructions.step7"><strong>Customize Display:</strong> Click "Settings" to adjust swatch size and font sizes to your preference</li>
+            <li data-i18n-html="instructions.step8"><strong>Add Multiple Points:</strong> Click multiple locations to create a color palette from your image</li>
+            <li data-i18n-html="instructions.step9"><strong>Export Image:</strong> Click "Export Image" to download the annotated image with all color labels</li>
+            <li data-i18n-html="instructions.step10"><strong>Export JSON:</strong> Click "Export JSON" to save color point data with coordinates for later use</li>
+            <li data-i18n-html="instructions.step11"><strong>Import JSON:</strong> Click "Import JSON" to restore previously saved color points and their positions</li>
         </ol>
 
         <div class="feature-list">
@@ -1237,25 +1148,25 @@
                     <span class="threshold-value" id="thresholdValue">8.0</span>
                 </div>
                 
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
-                    <div style="font-size: 0.9em; color: #666; margin-bottom: 10px; font-weight: 600;" data-i18n="similarColors.weightsTitle">⚖️ Matching Weights (Lower = More Important)</div>
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0;">
+                    <div style="font-size: 0.8em; color: #666; margin-bottom: 6px; font-weight: 600;" data-i18n="similarColors.weightsTitle">⚖️ Matching Weights (Lower = More Important)</div>
                     
-                    <div class="threshold-control" style="margin-bottom: 8px;">
-                        <label style="flex: 0 0 120px; font-size: 0.85em;" data-i18n="similarColors.lightnessWeight">Lightness (kL):</label>
+                    <div class="threshold-control" style="margin-bottom: 5px;">
+                        <label style="flex: 0 0 100px; font-size: 0.8em;" data-i18n="similarColors.lightnessWeight">Lightness (kL):</label>
                         <input type="range" id="modalKLSlider" min="0.1" max="2.0" value="0.3" step="0.05">
-                        <span class="threshold-value" id="modalKLValue" style="min-width: 40px; font-size: 0.95em;">0.30</span>
+                        <span class="threshold-value" id="modalKLValue" style="min-width: 35px; font-size: 0.85em;">0.30</span>
                     </div>
                     
-                    <div class="threshold-control" style="margin-bottom: 8px;">
-                        <label style="flex: 0 0 120px; font-size: 0.85em;" data-i18n="similarColors.chromaWeight">Chroma (kC):</label>
+                    <div class="threshold-control" style="margin-bottom: 5px;">
+                        <label style="flex: 0 0 100px; font-size: 0.8em;" data-i18n="similarColors.chromaWeight">Chroma (kC):</label>
                         <input type="range" id="modalKCSlider" min="0.1" max="2.0" value="1.0" step="0.05">
-                        <span class="threshold-value" id="modalKCValue" style="min-width: 40px; font-size: 0.95em;">1.00</span>
+                        <span class="threshold-value" id="modalKCValue" style="min-width: 35px; font-size: 0.85em;">1.00</span>
                     </div>
                     
                     <div class="threshold-control">
-                        <label style="flex: 0 0 120px; font-size: 0.85em;" data-i18n="similarColors.hueWeight">Hue (kH):</label>
+                        <label style="flex: 0 0 100px; font-size: 0.8em;" data-i18n="similarColors.hueWeight">Hue (kH):</label>
                         <input type="range" id="modalKHSlider" min="0.1" max="2.0" value="1.0" step="0.05">
-                        <span class="threshold-value" id="modalKHValue" style="min-width: 40px; font-size: 0.95em;">1.00</span>
+                        <span class="threshold-value" id="modalKHValue" style="min-width: 35px; font-size: 0.85em;">1.00</span>
                     </div>
                 </div>
             </div>
@@ -1343,6 +1254,115 @@
             <div class="modal-footer">
                 <button class="modal-btn modal-btn-cancel" id="exportJsonCancelBtn" data-i18n="exportJson.cancel">Cancel</button>
                 <button class="modal-btn modal-btn-primary" id="exportJsonConfirmBtn" data-i18n="exportJson.export">Export</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="similar-colors-modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>⚙️</span>
+                    <span data-i18n="settings.title">Settings</span>
+                </div>
+            </div>
+
+            <div class="modal-body" style="padding: 30px;">
+                <div class="config-row">
+                    <label data-i18n="settings.swatchSize">Swatch Size:</label>
+                    <input type="range" id="swatchSizeSlider" min="0" max="200" value="80" step="1">
+                    <input type="number" class="value-input" id="swatchSizeValue" min="0" value="80" step="1">
+                </div>
+                <div class="config-row">
+                    <label data-i18n="settings.codeFontSize">Code Font Size:</label>
+                    <input type="range" id="fontSizeSlider" min="0" max="200" value="14" step="1">
+                    <input type="number" class="value-input" id="fontSizeValue" min="0" value="14" step="1">
+                </div>
+                <div class="config-row">
+                    <label data-i18n="settings.nameFontSize">Name Font Size:</label>
+                    <input type="range" id="nameFontSizeSlider" min="0" max="200" value="11" step="1">
+                    <input type="number" class="value-input" id="nameFontSizeValue" min="0" value="11" step="1">
+                </div>
+                <div class="config-row">
+                    <label data-i18n="settings.labelWidth">Label Width:</label>
+                    <input type="range" id="labelWidthSlider" min="0" max="200" value="100" step="1">
+                    <input type="number" class="value-input" id="labelWidthValue" min="0" value="120" step="1">
+                </div>
+                
+                <h3 style="margin-top: 25px; font-size: 1.1em; color: #764ba2;" data-i18n="settings.colorMatchingTitle">🎨 Color Matching Weights</h3>
+                <p style="font-size: 0.85em; color: #666; margin-bottom: 15px;" data-i18n="settings.colorMatchingDesc">Lower values increase importance (Default: kL=0.3, kC=1.0, kH=1.0)</p>
+                
+                <div class="config-row">
+                    <label data-i18n="settings.lightnessWeight">Lightness (kL):</label>
+                    <input type="range" id="kLSlider" min="0.1" max="2.0" value="0.3" step="0.05">
+                    <input type="number" class="value-input" id="kLValue" min="0.1" max="2.0" value="0.30" step="0.05">
+                </div>
+                <div class="config-row">
+                    <label data-i18n="settings.chromaWeight">Chroma (kC):</label>
+                    <input type="range" id="kCSlider" min="0.1" max="2.0" value="1.0" step="0.05">
+                    <input type="number" class="value-input" id="kCValue" min="0.1" max="2.0" value="1.0" step="0.05">
+                </div>
+                <div class="config-row">
+                    <label data-i18n="settings.hueWeight">Hue (kH):</label>
+                    <input type="range" id="kHSlider" min="0.1" max="2.0" value="1.0" step="0.05">
+                    <input type="number" class="value-input" id="kHValue" min="0.1" max="2.0" value="1.0" step="0.05">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" id="settingsCancelBtn" data-i18n="modal.cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Color Filter Modal -->
+    <div class="modal-overlay" id="colorFilterModal">
+        <div class="similar-colors-modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>🎨</span>
+                    <span data-i18n="colorFilter.title">Color Filter</span>
+                </div>
+            </div>
+
+            <div class="modal-body" style="padding: 30px;">
+                <div class="filter-section">
+                    <div class="filter-section-title" data-i18n="colorFilter.systemTitle">Pantone System (Single Selection)</div>
+                    <div class="filter-radio-group" id="systemFilterGroup">
+                        <div class="filter-radio-option">
+                            <input type="radio" id="system-all" name="pantone-system" value="all" checked>
+                            <label class="filter-radio-label" for="system-all" data-i18n="colorFilter.allSystems">All Systems</label>
+                        </div>
+                        <div class="filter-radio-option">
+                            <input type="radio" id="system-graphics" name="pantone-system" value="graphics">
+                            <label class="filter-radio-label" for="system-graphics" data-i18n="colorFilter.graphics">Graphics (PMS)</label>
+                        </div>
+                        <div class="filter-radio-option">
+                            <input type="radio" id="system-fhi" name="pantone-system" value="fhi">
+                            <label class="filter-radio-label" for="system-fhi" data-i18n="colorFilter.fhi">Fashion, Home + Interiors (FHI)</label>
+                        </div>
+                        <div class="filter-radio-option">
+                            <input type="radio" id="system-plastics" name="pantone-system" value="plastics">
+                            <label class="filter-radio-label" for="system-plastics" data-i18n="colorFilter.plastics">Plastics</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-section-title" data-i18n="colorFilter.cardTypeTitle">Card Type (Multiple Selection)</div>
+                    <div class="filter-checkbox-group" id="cardTypeFilterGroup">
+                        <!-- Dynamic content will be loaded here based on system selection -->
+                    </div>
+                </div>
+
+                <div class="filter-stats" id="filterStats">
+                    <!-- Filter statistics will be displayed here -->
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" id="colorFilterCancelBtn" data-i18n="modal.cancel">Cancel</button>
             </div>
         </div>
     </div>
