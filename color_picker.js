@@ -51,8 +51,8 @@ const CARD_TYPE_DEFINITIONS = {
             { id: 'extended-gamut', name: 'Extended Gamut (XGC)', pattern: /^\d+\s+XGC$/ }
         ],
         suffixFilters: [
-            { id: 'suffix-c', name: 'Coated (C)', pattern: /\sC$/ },
-            { id: 'suffix-u', name: 'Uncoated (U)', pattern: /\sU$/ }
+            { id: 'suffix-c', name: 'Coated (C)', pattern: /\s(C|CP)$/ },
+            { id: 'suffix-u', name: 'Uncoated (U)', pattern: /\s(U|UP)$/ }
         ]
     },
     fhi: [
@@ -1902,9 +1902,3 @@ function applyImportedColorFilter(filter) {
     console.log('Applied imported color filter:', window.COLOR_FILTER);
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initColorPicker);
-} else {
-    initColorPicker();
-}

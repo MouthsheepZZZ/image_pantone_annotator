@@ -1355,6 +1355,8 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await window.i18n.init('en');
             console.log('i18n initialized');
+            // Initialize color picker after i18n is ready
+            initColorPicker();
         });
     </script>
 </body>
