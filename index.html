@@ -1015,23 +1015,42 @@
         <h3 data-i18n="settings.title">⚙️ Settings</h3>
         <div class="config-row">
             <label data-i18n="settings.swatchSize">Swatch Size:</label>
-            <input type="range" id="swatchSizeSlider" min="0" max="100" value="80" step="1">
+            <input type="range" id="swatchSizeSlider" min="0" max="200" value="80" step="1">
             <input type="number" class="value-input" id="swatchSizeValue" min="0" value="80" step="1">
         </div>
         <div class="config-row">
             <label data-i18n="settings.codeFontSize">Code Font Size:</label>
-            <input type="range" id="fontSizeSlider" min="0" max="100" value="14" step="1">
+            <input type="range" id="fontSizeSlider" min="0" max="200" value="14" step="1">
             <input type="number" class="value-input" id="fontSizeValue" min="0" value="14" step="1">
         </div>
         <div class="config-row">
             <label data-i18n="settings.nameFontSize">Name Font Size:</label>
-            <input type="range" id="nameFontSizeSlider" min="0" max="100" value="11" step="1">
+            <input type="range" id="nameFontSizeSlider" min="0" max="200" value="11" step="1">
             <input type="number" class="value-input" id="nameFontSizeValue" min="0" value="11" step="1">
         </div>
         <div class="config-row">
             <label data-i18n="settings.labelWidth">Label Width:</label>
-            <input type="range" id="labelWidthSlider" min="0" max="100" value="100" step="1">
+            <input type="range" id="labelWidthSlider" min="0" max="200" value="100" step="1">
             <input type="number" class="value-input" id="labelWidthValue" min="0" value="120" step="1">
+        </div>
+        
+        <h3 style="margin-top: 25px; font-size: 1.1em; color: #764ba2;" data-i18n="settings.colorMatchingTitle">🎨 Color Matching Weights</h3>
+        <p style="font-size: 0.85em; color: #666; margin-bottom: 15px;" data-i18n="settings.colorMatchingDesc">Lower values increase importance (Default: kL=0.3, kC=1.0, kH=1.0)</p>
+        
+        <div class="config-row">
+            <label data-i18n="settings.lightnessWeight">Lightness (kL):</label>
+            <input type="range" id="kLSlider" min="0.1" max="2.0" value="0.3" step="0.05">
+            <input type="number" class="value-input" id="kLValue" min="0.1" max="2.0" value="0.30" step="0.05">
+        </div>
+        <div class="config-row">
+            <label data-i18n="settings.chromaWeight">Chroma (kC):</label>
+            <input type="range" id="kCSlider" min="0.1" max="2.0" value="1.0" step="0.05">
+            <input type="number" class="value-input" id="kCValue" min="0.1" max="2.0" value="1.0" step="0.05">
+        </div>
+        <div class="config-row">
+            <label data-i18n="settings.hueWeight">Hue (kH):</label>
+            <input type="range" id="kHSlider" min="0.1" max="2.0" value="1.0" step="0.05">
+            <input type="number" class="value-input" id="kHValue" min="0.1" max="2.0" value="1.0" step="0.05">
         </div>
     </div>
 
@@ -1216,6 +1235,28 @@
                     <label data-i18n="similarColors.threshold">Threshold:</label>
                     <input type="range" id="thresholdSlider" min="1" max="20" value="8" step="0.5">
                     <span class="threshold-value" id="thresholdValue">8.0</span>
+                </div>
+                
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 10px; font-weight: 600;" data-i18n="similarColors.weightsTitle">⚖️ Matching Weights (Lower = More Important)</div>
+                    
+                    <div class="threshold-control" style="margin-bottom: 8px;">
+                        <label style="flex: 0 0 120px; font-size: 0.85em;" data-i18n="similarColors.lightnessWeight">Lightness (kL):</label>
+                        <input type="range" id="modalKLSlider" min="0.1" max="2.0" value="0.3" step="0.05">
+                        <span class="threshold-value" id="modalKLValue" style="min-width: 40px; font-size: 0.95em;">0.30</span>
+                    </div>
+                    
+                    <div class="threshold-control" style="margin-bottom: 8px;">
+                        <label style="flex: 0 0 120px; font-size: 0.85em;" data-i18n="similarColors.chromaWeight">Chroma (kC):</label>
+                        <input type="range" id="modalKCSlider" min="0.1" max="2.0" value="1.0" step="0.05">
+                        <span class="threshold-value" id="modalKCValue" style="min-width: 40px; font-size: 0.95em;">1.00</span>
+                    </div>
+                    
+                    <div class="threshold-control">
+                        <label style="flex: 0 0 120px; font-size: 0.85em;" data-i18n="similarColors.hueWeight">Hue (kH):</label>
+                        <input type="range" id="modalKHSlider" min="0.1" max="2.0" value="1.0" step="0.05">
+                        <span class="threshold-value" id="modalKHValue" style="min-width: 40px; font-size: 0.95em;">1.00</span>
+                    </div>
                 </div>
             </div>
 

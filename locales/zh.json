@@ -23,7 +23,12 @@
     "swatchSize": "色块大小：",
     "codeFontSize": "代码字体大小：",
     "nameFontSize": "名称字体大小：",
-    "labelWidth": "标签宽度："
+    "labelWidth": "标签宽度：",
+    "colorMatchingTitle": "色彩匹配权重",
+    "colorMatchingDesc": "数值越低重要性越高（默认值：kL=0.3, kC=1.0, kH=1.0）",
+    "lightnessWeight": "明度 (kL)：",
+    "chromaWeight": "色度 (kC)：",
+    "hueWeight": "色相 (kH)："
   },
   "colorFilter": {
     "title": "颜色筛选",
@@ -95,6 +100,10 @@
     "subtitle": "发现接近您选择的替代 Pantone 颜色",
     "currentSelection": "当前选择",
     "threshold": "阈值：",
+    "weightsTitle": "匹配权重（数值越低 = 重要性越高）",
+    "lightnessWeight": "明度 (kL)：",
+    "chromaWeight": "色度 (kC)：",
+    "hueWeight": "色相 (kH)：",
     "selectButton": "选择",
     "cancel": "取消",
     "noResults": "未找到相似颜色",

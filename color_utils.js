@@ -53,8 +53,9 @@ function rgbToLab(rgb) {
 
 // Calculate Delta E 2000 (CIEDE2000)
 // More accurate color difference calculation
-function deltaE2000(lab1, lab2) {
-    const kL = 1, kC = 1, kH = 1;
+// kL, kC, kH: weighting factors (lower value = higher importance)
+// Default kL=0.65 emphasizes lightness matching for artistic applications
+function deltaE2000(lab1, lab2, kL = 0.65, kC = 1, kH = 1) {
     
     const deltaLPrime = lab2.L - lab1.L;
     const LBar = (lab1.L + lab2.L) / 2;
@@ -123,7 +124,9 @@ function deltaE76(lab1, lab2) {
 }
 
 // Find closest Pantone color using improved Delta E 2000 algorithm
-function findClosestPantone(rgb, pantoneData) {
+// Optional weight parameters: kL (lightness), kC (chroma), kH (hue)
+// Lower values increase importance. Default kL=0.65 emphasizes lightness.
+function findClosestPantone(rgb, pantoneData, kL = 0.65, kC = 1, kH = 1) {
     const targetLab = rgbToLab(rgb);
     
     let closest = null;
@@ -135,7 +138,7 @@ function findClosestPantone(rgb, pantoneData) {
         
         const pantoneLab = rgbToLab(pantoneRgb);
         // Use Delta E 2000 for more accurate color matching
-        const distance = deltaE2000(targetLab, pantoneLab);
+        const distance = deltaE2000(targetLab, pantoneLab, kL, kC, kH);
         
         if (distance < minDistance) {
             minDistance = distance;

@@ -23,7 +23,12 @@
     "swatchSize": "Swatch Size:",
     "codeFontSize": "Code Font Size:",
     "nameFontSize": "Name Font Size:",
-    "labelWidth": "Label Width:"
+    "labelWidth": "Label Width:",
+    "colorMatchingTitle": "Color Matching Weights",
+    "colorMatchingDesc": "Lower values increase importance (Default: kL=0.3, kC=1.0, kH=1.0)",
+    "lightnessWeight": "Lightness (kL):",
+    "chromaWeight": "Chroma (kC):",
+    "hueWeight": "Hue (kH):"
   },
   "colorFilter": {
     "title": "Color Filter",
@@ -95,6 +100,10 @@
     "subtitle": "Discover alternative Pantone colors close to your selection",
     "currentSelection": "Current Selection",
     "threshold": "Threshold:",
+    "weightsTitle": "Matching Weights (Lower = More Important)",
+    "lightnessWeight": "Lightness (kL):",
+    "chromaWeight": "Chroma (kC):",
+    "hueWeight": "Hue (kH):",
     "selectButton": "Select",
     "cancel": "Cancel",
     "noResults": "No similar colors found",

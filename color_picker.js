@@ -20,6 +20,24 @@ window.COLOR_FILTER = {
     cardTypes: []
 };
 
+// Color matching weight configuration (Delta E 2000)
+// Lower values = higher importance in matching
+// kL: Lightness weight (default 0.3 strongly emphasizes lightness for artistic matching)
+// kC: Chroma weight (default 1.0)
+// kH: Hue weight (default 1.0)
+window.COLOR_MATCHING_WEIGHTS = {
+    kL: 0.3,  // Strongly emphasize lightness matching
+    kC: 1.0,   // Standard chroma matching
+    kH: 1.0    // Standard hue matching
+};
+
+// Modal-specific weights (used when finding similar colors)
+let modalWeights = {
+    kL: 0.3,
+    kC: 1.0,
+    kH: 1.0
+};
+
 // Card type definitions for each system
 // Graphics system uses two groups: main types and suffix filters
 const CARD_TYPE_DEFINITIONS = {
@@ -364,8 +382,14 @@ function handleMouseDown(e) {
             b: pixelData[2]
         };
         
-        // Find closest Pantone color using filtered data
-        const pantone = findClosestPantone(rgb, filteredPantoneData.length > 0 ? filteredPantoneData : pantoneData);
+        // Find closest Pantone color using filtered data with configured weights
+        const pantone = findClosestPantone(
+            rgb, 
+            filteredPantoneData.length > 0 ? filteredPantoneData : pantoneData,
+            window.COLOR_MATCHING_WEIGHTS.kL,
+            window.COLOR_MATCHING_WEIGHTS.kC,
+            window.COLOR_MATCHING_WEIGHTS.kH
+        );
         
         if (pantone) {
             // Calculate initial swatch position (fixed pixel distance from sample point)
@@ -429,8 +453,14 @@ function handleMouseMove(e) {
                     b: pixelData[2]
                 };
                 
-                // Find closest Pantone color using filtered data
-                const pantone = findClosestPantone(rgb, filteredPantoneData.length > 0 ? filteredPantoneData : pantoneData);
+                // Find closest Pantone color using filtered data with configured weights
+                const pantone = findClosestPantone(
+                    rgb, 
+                    filteredPantoneData.length > 0 ? filteredPantoneData : pantoneData,
+                    window.COLOR_MATCHING_WEIGHTS.kL,
+                    window.COLOR_MATCHING_WEIGHTS.kC,
+                    window.COLOR_MATCHING_WEIGHTS.kH
+                );
                 
                 if (pantone) {
                     point.rgb = rgb;
@@ -1014,6 +1044,66 @@ function setupConfigSliders() {
             });
         }
     });
+    
+    // Setup weight sliders
+    const weightSliders = [
+        { id: 'kL', prop: 'kL', displayId: 'kLValue' },
+        { id: 'kC', prop: 'kC', displayId: 'kCValue' },
+        { id: 'kH', prop: 'kH', displayId: 'kHValue' }
+    ];
+    
+    weightSliders.forEach(slider => {
+        const sliderElement = document.getElementById(slider.id + 'Slider');
+        const inputElement = document.getElementById(slider.displayId);
+        
+        if (sliderElement && inputElement) {
+            // Slider changes input
+            sliderElement.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                window.COLOR_MATCHING_WEIGHTS[slider.prop] = value;
+                inputElement.value = value.toFixed(2);
+            });
+            
+            // Input changes slider
+            inputElement.addEventListener('input', (e) => {
+                let value = parseFloat(e.target.value);
+                
+                // Validate input
+                const min = parseFloat(inputElement.min);
+                const max = parseFloat(inputElement.max);
+                
+                if (isNaN(value)) {
+                    return;
+                }
+                
+                // Enforce min and max
+                value = Math.max(min, Math.min(max, value));
+                
+                window.COLOR_MATCHING_WEIGHTS[slider.prop] = value;
+                sliderElement.value = value;
+                inputElement.value = value.toFixed(2);
+            });
+            
+            // Handle blur to ensure valid value
+            inputElement.addEventListener('blur', (e) => {
+                let value = parseFloat(e.target.value);
+                const min = parseFloat(inputElement.min);
+                const max = parseFloat(inputElement.max);
+                
+                if (isNaN(value) || value < min) {
+                    // If invalid, revert to current config value
+                    value = window.COLOR_MATCHING_WEIGHTS[slider.prop];
+                } else {
+                    // Enforce min and max
+                    value = Math.max(min, Math.min(max, value));
+                }
+                
+                inputElement.value = value.toFixed(2);
+                sliderElement.value = value;
+                window.COLOR_MATCHING_WEIGHTS[slider.prop] = value;
+            });
+        }
+    });
 }
 
 // Toggle color filter panel
@@ -1319,6 +1409,18 @@ function showSimilarColorsModal(pointIndex) {
     thresholdSlider.value = 8;
     document.getElementById('thresholdValue').textContent = '8.0';
     
+    // Initialize modal weight sliders with global values
+    modalWeights.kL = window.COLOR_MATCHING_WEIGHTS.kL;
+    modalWeights.kC = window.COLOR_MATCHING_WEIGHTS.kC;
+    modalWeights.kH = window.COLOR_MATCHING_WEIGHTS.kH;
+    
+    document.getElementById('modalKLSlider').value = modalWeights.kL;
+    document.getElementById('modalKLValue').textContent = modalWeights.kL.toFixed(2);
+    document.getElementById('modalKCSlider').value = modalWeights.kC;
+    document.getElementById('modalKCValue').textContent = modalWeights.kC.toFixed(2);
+    document.getElementById('modalKHSlider').value = modalWeights.kH;
+    document.getElementById('modalKHValue').textContent = modalWeights.kH.toFixed(2);
+    
     // Find and display similar colors
     updateSimilarColors();
     
@@ -1330,6 +1432,29 @@ function showSimilarColorsModal(pointIndex) {
     if (!thresholdSlider.hasAttribute('data-listener-added')) {
         thresholdSlider.addEventListener('input', updateSimilarColors);
         thresholdSlider.setAttribute('data-listener-added', 'true');
+        
+        // Modal weight sliders
+        const modalKLSlider = document.getElementById('modalKLSlider');
+        const modalKCSlider = document.getElementById('modalKCSlider');
+        const modalKHSlider = document.getElementById('modalKHSlider');
+        
+        modalKLSlider.addEventListener('input', (e) => {
+            modalWeights.kL = parseFloat(e.target.value);
+            document.getElementById('modalKLValue').textContent = modalWeights.kL.toFixed(2);
+            updateSimilarColors();
+        });
+        
+        modalKCSlider.addEventListener('input', (e) => {
+            modalWeights.kC = parseFloat(e.target.value);
+            document.getElementById('modalKCValue').textContent = modalWeights.kC.toFixed(2);
+            updateSimilarColors();
+        });
+        
+        modalKHSlider.addEventListener('input', (e) => {
+            modalWeights.kH = parseFloat(e.target.value);
+            document.getElementById('modalKHValue').textContent = modalWeights.kH.toFixed(2);
+            updateSimilarColors();
+        });
         
         document.getElementById('modalCancelBtn').addEventListener('click', closeSimilarColorsModal);
         
@@ -1369,28 +1494,32 @@ function updateSimilarColors() {
     
     // Find similar colors from the current filtered dataset (or all data if no filter)
     const searchData = filteredPantoneData.length > 0 ? filteredPantoneData : pantoneData;
-    const similarColors = findSimilarColors(currentPantone, searchData, threshold);
+    const similarColors = findSimilarColors(
+        point.rgb,
+        searchData, 
+        threshold,
+        modalWeights.kL,
+        modalWeights.kC,
+        modalWeights.kH
+    );
     
     // Render similar colors
     renderSimilarColors(similarColors, currentPantone);
 }
 
 // Find similar colors within threshold
-function findSimilarColors(targetPantone, searchData, threshold) {
-    const targetRgb = hexToRgb(targetPantone.hex);
+// targetRgb: Original sampled RGB color from image
+function findSimilarColors(targetRgb, searchData, threshold, kL = 0.65, kC = 1.0, kH = 1.0) {
     const targetLab = rgbToLab(targetRgb);
     
     const similar = [];
     
     for (const pantone of searchData) {
-        // Skip the current color itself
-        if (pantone.code === targetPantone.code) continue;
-        
         const pantoneRgb = hexToRgb(pantone.hex);
         if (!pantoneRgb) continue;
         
         const pantoneLab = rgbToLab(pantoneRgb);
-        const deltaE = deltaE2000(targetLab, pantoneLab);
+        const deltaE = deltaE2000(targetLab, pantoneLab, kL, kC, kH);
         
         if (deltaE <= threshold) {
             similar.push({
