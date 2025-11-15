@@ -124,8 +124,15 @@
 
         #controls {
             display: none;
-            gap: 15px;
+            flex-direction: column;
+            gap: 20px;
             margin-top: 20px;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
             flex-wrap: wrap;
             justify-content: center;
         }
@@ -772,6 +779,7 @@
     </div>
 
     <input type="file" id="fileInput" accept="image/*">
+    <input type="file" id="jsonFileInput" accept="application/json,.json" style="display: none;">
 
     <div id="canvasContainer">
         <div class="canvas-wrapper">
@@ -842,54 +850,73 @@
     </div>
 
     <div id="controls">
-        <button class="btn btn-secondary" id="colorFilterBtn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path>
-            </svg>
-            Color Filter
-        </button>
-        
-        <button class="btn btn-secondary" id="configBtn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M12 1v6m0 6v6m0-18a2 2 0 0 1 2 2v.4a2 2 0 0 0 1 1.7l2 1.2a2 2 0 0 1 1 1.7V8a2 2 0 0 1-2 2h-.4a2 2 0 0 0-1.7 1l-1.2 2a2 2 0 0 1-1.7 1H8a2 2 0 0 1-2-2v-.4a2 2 0 0 0-1-1.7l-2-1.2a2 2 0 0 1-1-1.7V8a2 2 0 0 1 2-2h.4a2 2 0 0 0 1.7-1l1.2-2a2 2 0 0 1 1.7-1z"></path>
-            </svg>
-            Settings
-        </button>
-        
-        <button class="btn btn-primary" id="exportBtn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Export Image
-        </button>
-        
-        <button class="btn btn-secondary" id="undoBtn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="1 4 1 10 7 10"></polyline>
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-            </svg>
-            Undo
-        </button>
-        
-        <button class="btn btn-danger" id="clearBtn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-            Clear All
-        </button>
-
-        <button class="btn btn-success" onclick="location.reload()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="23 4 23 10 17 10"></polyline>
-                <polyline points="1 20 1 14 7 14"></polyline>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-            </svg>
-            New Image
-        </button>
+        <div class="control-group">
+            <button class="btn btn-success" onclick="location.reload()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                New Image
+            </button>
+        </div>
+        <div class="control-group">
+            <button class="btn btn-secondary" id="importJsonBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Import JSON
+            </button>
+            <button class="btn btn-primary" id="exportJsonBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <line x1="10" y1="9" x2="8" y2="9"></line>
+                </svg>
+                Export JSON
+            </button>
+            <button class="btn btn-primary" id="exportBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export Image
+            </button>
+        </div>
+        <div class="control-group">
+            <button class="btn btn-secondary" id="colorFilterBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path>
+                </svg>
+                Color Filter
+            </button>
+            <button class="btn btn-secondary" id="configBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m0-18a2 2 0 0 1 2 2v.4a2 2 0 0 0 1 1.7l2 1.2a2 2 0 0 1 1 1.7V8a2 2 0 0 1-2 2h-.4a2 2 0 0 0-1.7 1l-1.2 2a2 2 0 0 1-1.7 1H8a2 2 0 0 1-2-2v-.4a2 2 0 0 0-1-1.7l-2-1.2a2 2 0 0 1-1-1.7V8a2 2 0 0 1 2-2h.4a2 2 0 0 0 1.7-1l1.2-2a2 2 0 0 1 1.7-1z"></path>
+                </svg>
+                Settings
+            </button>
+            <button class="btn btn-secondary" id="undoBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="1 4 1 10 7 10"></polyline>
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+                Undo
+            </button>
+            <button class="btn btn-danger" id="clearBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Clear All
+            </button>
+        </div>
     </div>
 
     <div class="instructions">
@@ -902,7 +929,9 @@
             <li><strong>Filter Colors:</strong> Click "Color Filter" to select specific Pantone systems and card types for matching</li>
             <li><strong>Customize Display:</strong> Click "Settings" to adjust swatch size and font sizes to your preference</li>
             <li><strong>Add Multiple Points:</strong> Click multiple locations to create a color palette from your image</li>
-            <li><strong>Export Result:</strong> Click "Export Image" to download the annotated image with all color labels</li>
+            <li><strong>Export Image:</strong> Click "Export Image" to download the annotated image with all color labels</li>
+            <li><strong>Export JSON:</strong> Click "Export JSON" to save color point data with coordinates for later use</li>
+            <li><strong>Import JSON:</strong> Click "Import JSON" to restore previously saved color points and their positions</li>
         </ol>
 
         <div class="feature-list">
@@ -929,6 +958,10 @@
             <div class="feature">
                 <strong>📤 Easy Export</strong>
                 Download your annotated image with one click
+            </div>
+            <div class="feature">
+                <strong>💾 Save & Load</strong>
+                Export/import color points as JSON for reuse
             </div>
             <div class="feature">
                 <strong>⚡ Fast & Responsive</strong>
