@@ -105,6 +105,12 @@ class I18n {
             
             element.title = translation;
         });
+
+        // Update page title
+        const pageTitle = this.t('header.title');
+        if (pageTitle && pageTitle !== 'header.title') {
+            document.title = pageTitle;
+        }
     }
 
     updateLanguageSwitcher() {

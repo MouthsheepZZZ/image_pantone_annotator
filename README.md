@@ -28,7 +28,7 @@ A professional web-based tool for extracting colors from images and matching the
 
 ## Files
 
-- `color_picker.html` - Main application interface with responsive design
+- `index.html` - Main application interface with responsive design
 - `color_picker.js` - Core interaction logic and canvas handling
 - `color_utils.js` - Color conversion and matching algorithms (Delta E 2000)
 - `i18n.js` - Internationalization support for multiple languages
@@ -37,13 +37,27 @@ A professional web-based tool for extracting colors from images and matching the
 - `Pantone_finder/` - Original data scraper and JSON source
 - `docs/` - Documentation and format specifications
 
-## Quick Start
+## How to Use
 
-### Option 1: Windows Batch File (Easiest)
+There are two ways to use this tool:
 
-Double-click `start_server.bat` to automatically start the server and open the application.
+### 1. Online (Recommended)
 
-### Option 2: Command Line
+Access the tool directly via the deployed GitHub Pages:
+
+**[https://mouthsheepzzz.github.io/image_pantone_annotator/](https://mouthsheepzzz.github.io/image_pantone_annotator/)**
+
+This is the easiest way to get started, with no setup required.
+
+### 2. Local Deployment
+
+If you need to run the tool locally or want to make modifications, follow these steps:
+
+#### Option 1: Windows Batch File (Easiest)
+
+Double-click `start_server.bat` to automatically start a local server and open the application in your browser.
+
+#### Option 2: Command Line
 
 **Start a local web server:**
 
@@ -58,19 +72,17 @@ python -m SimpleHTTPServer 8000
 npx http-server -p 8000
 ```
 
-Then open `http://localhost:8000/color_picker.html` in your browser.
+Then open `http://localhost:8000/index.html` in your browser.
 
-## Usage
+> **Note**: A local server is required because the application uses the `fetch` API to load the Pantone color database (`pantone_data.json`), which is restricted by browser security policies when opening the HTML file directly from the local filesystem (`file:///...`).
+
 
 ### Basic Workflow
 
-1. **Start a local web server** (see Quick Start above)
-2. **Navigate to** `http://localhost:8000/color_picker.html` in your browser
-3. **Upload an image**:
-   - Click the upload area or drag & drop an image
-   - Or press `Ctrl+V` to paste from clipboard
-4. **Extract colors**: Click on any location in the image to extract the color
-5. The tool will display the closest matching Pantone color with:
+1. **Open the application** using one of the methods described above.
+2. **Upload an image**: Click the upload area or drag & drop an image
+3. **Extract colors**: Click on any location in the image to extract the color
+4. The tool will display the closest matching Pantone color with:
    - Color swatch
    - Pantone code (e.g., "19-3909 TCX")
    - Color name (e.g., "Black Bean")
@@ -145,13 +157,11 @@ Works in all modern browsers that support:
 - **Zero dependencies!** All Pantone data is loaded from JSON file
 - No external JavaScript libraries required
 - Requires a local web server (Python, Node.js, or any HTTP server)
-- Works offline once the server is running
-
 ## Project Structure
 
 ```
 pantone_color_creator/
-├── color_picker.html      # Main application interface
+├── index.html             # Main application interface
 ├── color_picker.js        # Application logic and interaction handling
 ├── color_utils.js         # Color conversion & Delta E 2000 algorithm
 ├── i18n.js                # Internationalization support

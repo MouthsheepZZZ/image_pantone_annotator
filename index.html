@@ -3,12 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantone Color Picker</title>
+    <title id="pageTitle">Pantone Color Annotator</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        .top-banner {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 25px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 101;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-banner a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .top-banner a:hover {
+            color: #3498db;
         }
 
         body {
@@ -19,6 +45,7 @@
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            padding-top: 60px; /* Added padding for the banner */
         }
 
         .header {
@@ -776,37 +803,31 @@
 
         /* Language Switcher */
         .lang-switcher {
-            position: fixed;
-            top: 20px;
-            right: 20px;
             display: flex;
             gap: 8px;
-            z-index: 100;
         }
 
         .lang-btn {
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid rgba(102, 126, 234, 0.3);
+            padding: 6px 14px;
+            background: transparent;
+            border: 2px solid #7f8c8d;
             border-radius: 20px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            color: #667eea;
-            font-size: 0.9em;
+            color: #ecf0f1;
+            font-size: 0.85em;
         }
 
         .lang-btn:hover {
-            background: white;
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            background: #34495e;
+            border-color: #95a5a6;
         }
 
         .lang-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #3498db;
             color: white;
-            border-color: #667eea;
+            border-color: #3498db;
         }
 
         /* Export Options Styles */
@@ -855,10 +876,15 @@
     </style>
 </head>
 <body>
-    <!-- Language Switcher -->
-    <div class="lang-switcher">
-        <button class="lang-btn" data-lang="en" onclick="window.i18n.setLanguage('en')">English</button>
-        <button class="lang-btn" data-lang="zh" onclick="window.i18n.setLanguage('zh')">中文</button>
+    <div class="top-banner">
+        <div class="banner-info">
+            <span>Created by MouthsheepZZZ</span>
+            <a href="https://github.com/MouthsheepZZZ/image_pantone_annotator" target="_blank">GitHub Repository</a>
+        </div>
+        <div class="lang-switcher">
+            <button class="lang-btn" data-lang="en" onclick="window.i18n.setLanguage('en')">English</button>
+            <button class="lang-btn" data-lang="zh" onclick="window.i18n.setLanguage('zh')">中文</button>
+        </div>
     </div>
 
     <div class="header">

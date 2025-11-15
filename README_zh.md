@@ -28,7 +28,7 @@
 
 ## 文件说明
 
-- `color_picker.html` - 主应用界面，采用响应式设计
+- `index.html` - 主应用界面，采用响应式设计
 - `color_picker.js` - 核心交互逻辑和画布处理
 - `color_utils.js` - 颜色转换和匹配算法（Delta E 2000）
 - `i18n.js` - 多语言国际化支持
@@ -37,15 +37,29 @@
 - `Pantone_finder/` - 原始数据爬虫和 JSON 数据源
 - `docs/` - 文档和格式规范
 
-## 快速开始
+## 如何使用
 
-### 方法 1：Windows 批处理文件（最简单）
+您可以通过以下两种方式使用本工具：
 
-双击 `start_server.bat` 自动启动服务器并打开应用。
+### 1. 在线使用 (推荐)
 
-### 方法 2：命令行
+直接通过已部署的 GitHub Pages 访问：
 
-**启动本地 Web 服务器：**
+**[https://mouthsheepzzz.github.io/image_pantone_annotator/](https://mouthsheepzzz.github.io/image_pantone_annotator/)**
+
+这是最简单快捷的方式，无需任何本地配置。
+
+### 2. 本地部署
+
+如果您需要在本地运行该工具，或者希望进行二次开发，请按以下步骤操作：
+
+#### 方法一：Windows 批处理文件 (最简单)
+
+双击 `start_server.bat` 文件，它将自动启动一个本地服务器，并在您的浏览器中打开应用程序。
+
+#### 方法二：命令行
+
+**启动一个本地 Web 服务器：**
 
 ```bash
 # 使用 Python 3
@@ -58,15 +72,17 @@ python -m SimpleHTTPServer 8000
 npx http-server -p 8000
 ```
 
-然后在浏览器中打开 `http://localhost:8000/color_picker.html`。
+然后在浏览器中打开 `http://localhost:8000/index.html`。
 
-## 使用说明
+> **注意**：必须使用本地服务器，因为应用需要通过 `fetch` API 加载 Pantone 颜色数据库 (`pantone_data.json`)。如果直接通过 `file:///...` 方式打开 HTML 文件，浏览器的安全策略会阻止此操作。
+
+
+
 
 ### 基本工作流程
 
-1. **启动本地 Web 服务器**（参见上方快速开始）
-2. **在浏览器中访问** `http://localhost:8000/color_picker.html`
-3. **上传图片**：
+1. **打开应用**：使用上述任一方法打开应用。
+2. **上传图片**：
    - 点击上传区域或拖放图片
    - 或按 `Ctrl+V` 从剪贴板粘贴
 4. **提取颜色**：点击图片上的任意位置提取颜色
@@ -145,13 +161,11 @@ window.SWATCH_CONFIG.labelWidth = 150;
 - **零依赖！** 所有 Pantone 数据从 JSON 文件加载
 - 不需要外部 JavaScript 库
 - 需要本地 Web 服务器（Python、Node.js 或任何 HTTP 服务器）
-- 服务器运行后可离线工作
-
 ## 项目结构
 
 ```
 pantone_color_creator/
-├── color_picker.html      # 主应用界面
+├── index.html             # 主应用界面
 ├── color_picker.js        # 应用逻辑和交互处理
 ├── color_utils.js         # 颜色转换和 Delta E 2000 算法
 ├── i18n.js                # 国际化支持
